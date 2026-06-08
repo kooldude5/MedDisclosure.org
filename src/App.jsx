@@ -321,9 +321,9 @@ If no matching device is found, write two short plain paragraphs under the same 
       <h3 style={{ fontSize: 15, fontWeight: 500, color: TEAL_DARK, marginBottom: "1rem" }}>What you can do next</h3>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {[
-          { icon: "link", title: "Share this site", body: "Know someone who's been treated with AI medical tools? Send them this page so they can look up their device too."},
+          { icon: "link", title: "Share this site", body: "Know someone who's been treated with AI medical tools? Send them this page so they can look up their device too.", actionLabel: "Copy link",       onClick: () => navigator.clipboard?.writeText("meddisclosure.org") },
           { icon: "bank", title: "Tell your representatives", body: "Right now, companies aren't required to share this information publicly. Your representatives can change that.", actionLabel: "Find my rep →", href: "https://www.house.gov/representatives/find-your-representative" },
-          { icon: "heart", title: "Advocate for transparency", body: "Read our policy page to understand what we're asking for — and share it with anyone who works in healthcare or government."},
+          { icon: "heart", title: "Advocate for transparency", body: "Read our policy page to understand what we're asking for — and share it with anyone who works in healthcare or government.", actionLabel: "Read the policy →" },
         ].map((s, i) => (
           <div key={i} style={{ background: "#fff", border: "0.5px solid #c8e6dc", borderRadius: 10, padding: "1rem 1.25rem", display: "flex", gap: 14, alignItems: "flex-start" }}>
             <div style={{ width: 36, height: 36, borderRadius: 8, background: TEAL_LIGHT, border: `0.5px solid ${TEAL_MID}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -591,19 +591,18 @@ export default function App() {
   const [downloads, setDownloads] = useState(128);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const res = await window.storage.get("memo_downloads", true);
-        if (res) setDownloads(parseInt(res.value));
-      } catch {}
-    })();
+    fetch("/api/downloads")
+      .then(r => r.json())
+      .then(d => setDownloads(d.count))
+      .catch(() => {});
   }, []);
 
   async function handleDownload() {
-    const next = downloads + 1;
-    setDownloads(next);
-    try { await window.storage.set("memo_downloads", String(next), true); } catch {}
     window.open("/memo.pdf", "_blank");
+    fetch("/api/downloads", { method: "POST" })
+      .then(r => r.json())
+      .then(d => setDownloads(d.count))
+      .catch(() => setDownloads(prev => prev + 1));
   }
 
   function handleSetPage(p) {
