@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const TEAL = "#0F6E56";
 const TEAL_LIGHT = "#E1F5EE";
