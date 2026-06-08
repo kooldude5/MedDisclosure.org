@@ -26,22 +26,22 @@ const CASE_STUDIES = [
     cite: "Daneshjou et al., JAMA Dermatology, 2021",
     url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9379852/pdf/nihms-1825908.pdf",
     short: "Of 70 dermatology AI studies, only 7 reported any skin tone data. Four had zero images of the darkest skin types — meaning FDA-cleared tools may be operating well outside their validated conditions for patients with darker skin.",
-    body: "Of 70 dermatology AI studies reviewed, only 7 reported any skin tone data. Four had no images of the darkest skin types (Fitzpatrick V and VI) at all. An FDA-cleared tool may be operating well outside its validated conditions for patients with darker skin — with no way for clinicians to know. The authors found no reporting guidelines specific to dermatology AI and called for their development."
+    body: "Of 70 dermatology AI studies reviewed, only 7 reported any skin tone data. Four had no images of the darkest skin types (Fitzpatrick V and VI) at all. An FDA-cleared tool may be operating well outside its validated conditions for patients with darker skin — with no way for clinicians to know."
   },
   {
     title: "The pulse oximeter",
     cite: "Sjoding et al., NEJM, 2020; Johns Hopkins, 2024",
     url: "https://publichealth.jhu.edu/2024/pulse-oximeters-racial-bias",
-    short: "During COVID-19, pulse oximeters — found in every hospital room — were three times more likely to give inaccurate readings for Black patients, masking hypoxemia and delaying or denying care. The FDA testing standard, unchanged from 2013, required only two darkly pigmented validation subjects.",
-    body: "In every hospital room. During COVID-19, a device gating access to emergency care was approximately three times more likely to give inaccurate readings for Black patients. The FDA premarket testing standard, unchanged from 2013, required manufacturers to include just two darkly pigmented subjects. The result: delayed care for Black and Hispanic patients, and in some cases denial of medications they qualified for but whose need was masked by an inaccurate reading."
+    short: "During COVID-19, pulse oximeters were three times more likely to give inaccurate readings for Black patients, masking hypoxemia and delaying care. The FDA testing standard required only two darkly pigmented validation subjects.",
+    body: "In every hospital room. During COVID-19, a device gating access to emergency care was approximately three times more likely to give inaccurate readings for Black patients. The FDA premarket testing standard, unchanged from 2013, required manufacturers to include just two darkly pigmented subjects. The result: delayed care for Black and Hispanic patients, and in some cases denial of medications they qualified for."
   },
 ];
 
 const POLICY_SECTIONS = [
-  { icon: "file", title: "The disclosure gap", body: "21 CFR 807.92 governs 510(k) summaries but does not require training-data demographics for AI/ML models. Approximately 95% of AI/ML devices are cleared via 510(k) — making the public summary the only document patients and clinicians can access. The gap is structural, not incidental." },
-  { icon: "pulse", title: "The clinical stakes", body: "Three documented case studies — a care management algorithm that systematically underestimated Black patients' needs, dermatology AI trained on almost no dark skin tones, and pulse oximeters that gave dangerously inaccurate readings for Black and Hispanic patients — all trace to the same root: undisclosed demographic mismatch." },
-  { icon: "chart", title: "Why voluntary has failed", body: "Guidance has been in place since 2021. Voluntary uptake remains under 25%. Average transparency scores sit at 3.3 out of 17 possible points. Manufacturers face a structural competitive disincentive to disclose unilaterally — a mandate is the only mechanism that solves the collective-action problem." },
-  { icon: "globe", title: "The U.S. is falling behind", body: "The EU AI Act imposes hard documentation requirements for medical device AI beginning 2026–2027. U.S. manufacturers will produce this documentation for European regulators regardless. The only question is whether American patients receive the same transparency protections." },
+  { icon: "file", title: "The disclosure gap", body: "21 CFR 807.92 governs 510(k) summaries but does not require training-data demographics for AI/ML models. Approximately 95% of AI/ML devices are cleared via 510(k) — making the public summary the only document patients and clinicians can access." },
+  { icon: "pulse", title: "The clinical stakes", body: "Three documented case studies — a care management algorithm, dermatology AI, and pulse oximeters — all trace to the same root: undisclosed demographic mismatch between training and deployment populations." },
+  { icon: "chart", title: "Why voluntary has failed", body: "Guidance has been in place since 2021. Voluntary uptake remains under 25%. Average transparency scores sit at 3.3 out of 17 possible points. A mandate is the only mechanism that solves the collective-action problem." },
+  { icon: "globe", title: "The U.S. is falling behind", body: "The EU AI Act imposes hard documentation requirements for medical device AI beginning 2026–2027. U.S. manufacturers will produce this documentation for European regulators regardless. The question is whether American patients receive the same protections." },
 ];
 
 const SvgIcon = ({ name, size = 20, color = TEAL, strokeWidth = 1.8 }) => {
@@ -102,7 +102,7 @@ function InfoTooltip({ text }) {
   const [show, setShow] = useState(false);
   return (
     <span style={{ position: "relative", display: "inline-flex", alignItems: "center" }}>
-      <button onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)} onClick={() => setShow(v => !v)} style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "inline-flex", alignItems: "center" }} aria-label="More info">
+      <button onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)} onClick={() => setShow(v => !v)} style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "inline-flex", alignItems: "center" }}>
         <SvgIcon name="info" size={16} color={TEAL_MID} />
       </button>
       {show && (
@@ -113,9 +113,6 @@ function InfoTooltip({ text }) {
     </span>
   );
 }
-
-// Shared memo download counter stored in module scope (resets on reload — backend needed for persistence)
-let globalDownloads = 128;
 
 function NavBar({ page, setPage }) {
   return (
@@ -157,10 +154,42 @@ function Footer({ setPage }) {
         </div>
       </div>
       <div style={{ maxWidth: 720, margin: "1.5rem auto 0", paddingTop: "1rem", borderTop: "0.5px solid rgba(255,255,255,0.15)", fontSize: 12, color: "#9FE1CB", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
-        <span>© 2025 MedDisclosure.ai · Wes Krikorian</span>
+        <span>© 2025 MedDisclosure.org · Wes Krikorian</span>
         <span>Not affiliated with the FDA or any device manufacturer.</span>
       </div>
     </footer>
+  );
+}
+
+function EmailDraft({ audience }) {
+  const [copied, setCopied] = useState(false);
+  const subject = "Support Mandatory AI Transparency in FDA-Cleared Medical Devices";
+  const body = audience === "patient"
+    ? `Dear [Representative's Name],\n\nI am a constituent writing to urge your support for mandatory transparency requirements for AI-enabled medical devices cleared by the FDA.\n\nI recently learned that over 1,451 AI/ML medical devices have been cleared by the FDA, yet fewer than 1 in 4 disclose who they were tested on. As a patient, I have no way to know whether the AI tools used in my care were ever tested on people like me.\n\nI urge you to direct the FDA to require manufacturers to publicly disclose the demographic makeup of their AI device testing data. This is a simple fix — the data already exists. Patients just can't see it.\n\nFor more information, please visit: meddisclosure.org\n\nThank you for your time.\n\nSincerely,\n[Your Name]\n[Your City, State]`
+    : audience === "provider"
+    ? `Dear [Representative's Name],\n\nI am a healthcare provider writing to urge your support for mandatory transparency requirements for AI-enabled medical devices cleared by the FDA.\n\nOver 1,451 AI/ML medical devices have been cleared by the FDA, yet fewer than 1 in 4 disclose any information about the demographic composition of their validation data. As a clinician, I have no reliable way to know whether the AI tools I use daily were ever tested on patients who look like mine.\n\nI urge you to direct the FDA to amend 21 CFR 807.92 to require a standardized "Model Card" disclosure in every public 510(k) summary for AI/ML devices. This is a narrow, low-burden fix — manufacturers already collect this data internally. It simply requires them to make it public.\n\nFor more information, please visit: meddisclosure.org\n\nThank you for your time and leadership on this issue.\n\nSincerely,\n[Your Name]\n[Your Institution]\n[Your State]`
+    : `Dear [Representative's Name],\n\nI am writing to urge your support for mandatory transparency requirements for AI-enabled medical devices cleared by the FDA.\n\nOver 1,451 AI/ML medical devices have been cleared by the FDA, yet fewer than 1 in 4 disclose who they were tested on. Documented cases — including a commercial algorithm that cut Black patients' access to care management by more than half, and pulse oximeters that gave dangerously inaccurate readings for Black patients during COVID-19 — show the real-world consequences of this gap.\n\nThe fix is straightforward: amend 21 CFR 807.92 to require a standardized "Model Card" in every public 510(k) summary for AI/ML devices. This requires no new data collection — manufacturers already hold this information internally. The EU AI Act will require this documentation for European regulators beginning in 2026. American patients deserve the same transparency.\n\nFor more information and the full policy brief, please visit: meddisclosure.org\n\nThank you for your attention to this important issue.\n\nSincerely,\n[Your Name]\n[Your State]`;
+
+  function copy() {
+    navigator.clipboard?.writeText(`Subject: ${subject}\n\n${body}`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  return (
+    <div style={{ marginTop: 10, background: "#fff", border: `0.5px solid ${TEAL_MID}`, borderRadius: 8, overflow: "hidden" }}>
+      <div style={{ background: TEAL_LIGHT, padding: "8px 12px", fontSize: 12, fontWeight: 500, color: TEAL_DARK, borderBottom: `0.5px solid ${TEAL_MID}` }}>Subject: {subject}</div>
+      <pre style={{ margin: 0, padding: "12px", fontSize: 12, color: "#444", lineHeight: 1.7, whiteSpace: "pre-wrap", fontFamily: "inherit" }}>{body}</pre>
+      <div style={{ padding: "8px 12px", borderTop: `0.5px solid #d0e8e1`, display: "flex", gap: 8 }}>
+        <button onClick={copy} style={{ background: copied ? "#d0f0e5" : TEAL, color: copied ? TEAL_DARK : "#fff", border: "none", borderRadius: 6, padding: "5px 12px", fontSize: 12, fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 5 }}>
+          <SvgIcon name={copied ? "check" : "notes"} size={12} color={copied ? TEAL_DARK : "#fff"} />
+          {copied ? "Copied!" : "Copy to clipboard"}
+        </button>
+        <a href="https://www.house.gov/representatives/find-your-representative" target="_blank" rel="noreferrer" style={{ background: "none", border: `0.5px solid ${TEAL_MID}`, borderRadius: 6, padding: "5px 12px", fontSize: 12, color: TEAL, fontWeight: 500, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 5 }}>
+          <SvgIcon name="pin" size={12} /> Find your rep →
+        </a>
+      </div>
+    </div>
   );
 }
 
@@ -190,7 +219,7 @@ function HomePage({ setPage, downloads }) {
         <div style={{ display: "flex", gap: 16, maxWidth: 720, margin: "0 auto", flexWrap: "wrap" }}>
           {STATS.map(s => <StatCard key={s.num} {...s} />)}
           <div style={{ flex: 1, minWidth: 160, background: "#fff", border: `2px solid ${TEAL_MID}`, borderRadius: 12, padding: "1.25rem 1.5rem", textAlign: "center" }}>
-            <div style={{ fontSize: 32, fontWeight: 500, color: TEAL, letterSpacing: "-1px" }}>{downloads}</div>
+            <div style={{ fontSize: 32, fontWeight: 500, color: TEAL, letterSpacing: "-1px" }}>{downloads ?? "—"}</div>
             <div style={{ fontSize: 13, color: "#555", marginTop: 4, lineHeight: 1.4 }}>policy memo downloads</div>
           </div>
         </div>
@@ -205,9 +234,9 @@ function HomePage({ setPage, downloads }) {
             <div style={{ fontSize: 11, color: TEAL, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 4 }}>Policy memo</div>
             <div style={{ fontSize: 16, fontWeight: 500, color: TEAL_DARK, marginBottom: 6 }}>Mandatory Transparency for Medical AI/ML Devices</div>
             <div style={{ fontSize: 13, color: "#555", lineHeight: 1.6, marginBottom: 12 }}>A Congressional-facing policy brief making the case to amend 21 CFR 807.92 — requiring a standardized Model Card in every public 510(k) summary for AI/ML-enabled devices.</div>
-            <button onClick={() => setPage("__download__")} style={{ background: TEAL, color: "#fff", border: "none", borderRadius: 7, padding: "7px 16px", fontSize: 13, fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}>
+            <a href="/memo.pdf" target="_blank" rel="noreferrer" onClick={() => fetch("/api/downloads", { method: "POST" }).catch(() => {})} style={{ background: TEAL, color: "#fff", border: "none", borderRadius: 7, padding: "7px 16px", fontSize: 13, fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6, textDecoration: "none" }}>
               <SvgIcon name="download" size={15} color="#fff" /> Download PDF
-            </button>
+            </a>
           </div>
         </div>
       </div>
@@ -220,7 +249,7 @@ function HomePage({ setPage, downloads }) {
           <div>
             <div style={{ fontSize: 11, color: TEAL, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 4 }}>About this project</div>
             <div style={{ fontSize: 15, fontWeight: 500, color: TEAL_DARK, marginBottom: 6 }}>Wes Krikorian</div>
-            <div style={{ fontSize: 13, color: "#555", lineHeight: 1.7 }}>I'm a researcher focused on health equity and AI policy. I built MedDisclosure.ai because patients have a right to know whether the algorithm being used in their care was ever tested on someone who looks like them — and right now, most aren't. This site exists to close that gap, one disclosure at a time.</div>
+            <div style={{ fontSize: 13, color: "#555", lineHeight: 1.7 }}>I'm a researcher focused on health equity and AI policy. I built MedDisclosure.org because patients have a right to know whether the algorithm being used in their care was ever tested on someone who looks like them — and right now, most aren't. This site exists to close that gap, one disclosure at a time.</div>
           </div>
         </div>
       </div>
@@ -233,37 +262,22 @@ function PatientsPage() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState("");
+  const [showPatientEmail, setShowPatientEmail] = useState(false);
 
   async function handleSearch() {
     if (!query.trim()) return;
     setLoading(true); setResult(null);
     try {
       setLoadingStep("Searching the FDA device database…");
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
+      const res = await fetch("/api/lookup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514", max_tokens: 1000,
-          tools: [{ type: "web_search_20250305", name: "web_search" }],
-          messages: [{ role: "user",           content: `You are a medical AI transparency assistant helping a patient look up an FDA-cleared AI medical device. The patient searched for: "${query}".
-
-Step 1: Search the FDA's AI-enabled medical devices list at https://www.fda.gov/medical-devices/software-medical-device-samd/artificial-intelligence-enabled-medical-devices to find a matching device.
-Step 2: Retrieve and read its 510(k) summary from the FDA database.
-Step 3: Do not narrate your search process, do not explain what you are doing, do not say what you found or didn't find along the way. Go silent until you have the answer, then write your response in exactly this format — two labeled paragraphs, plain prose only, no bullet points, no headers with colons acting as titles, no emojis, no markdown:
-
-What is this device?
-[One plain paragraph. Explain what the device does in simple everyday language, who made it, and when the FDA cleared it. Write like you're explaining it to a friend, not a doctor.]
-
-Who was it trained on?
-[One plain paragraph. State exactly what demographic information the manufacturer disclosed about the patients used to test or train this AI — age, sex, race, ethnicity, geography, dataset size. If any of this was not disclosed, say so plainly and note that this is the transparency gap MedDisclosure.org is working to fix.]
-
-If no matching device is found, write two short plain paragraphs under the same headers explaining that and suggesting the patient ask their care provider for the exact device name or 510(k) number.` }]
-        })
+        body: JSON.stringify({ query }),
       });
       setLoadingStep("Reading the FDA summary document…");
       const data = await res.json();
-      const text = (data.content || []).filter(b => b.type === "text").map(b => b.text).join("\n").trim();
-      setResult(text || "We couldn't find that device right now. Try the exact company name or device name from your paperwork.");
+      const text = data.result || "We couldn't find that device right now. Try the exact company name or device name from your paperwork.";
+      setResult(text);
     } catch { setResult("Something went wrong. Please try again in a moment."); }
     setLoading(false); setLoadingStep("");
   }
@@ -320,33 +334,54 @@ If no matching device is found, write two short plain paragraphs under the same 
 
       <h3 style={{ fontSize: 15, fontWeight: 500, color: TEAL_DARK, marginBottom: "1rem" }}>What you can do next</h3>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {[
-          { icon: "link", title: "Share this site", body: "Know someone who's been treated with AI medical tools? Send them this page so they can look up their device too.", actionLabel: "Copy link",       onClick: () => navigator.clipboard?.writeText("meddisclosure.org") },
-          { icon: "bank", title: "Tell your representatives", body: "Right now, companies aren't required to share this information publicly. Your representatives can change that.", actionLabel: "Find my rep →", href: "https://www.house.gov/representatives/find-your-representative" },
-          { icon: "heart", title: "Advocate for transparency", body: "Read our policy page to understand what we're asking for — and share it with anyone who works in healthcare or government.", actionLabel: "Read the policy →" },
-        ].map((s, i) => (
-          <div key={i} style={{ background: "#fff", border: "0.5px solid #c8e6dc", borderRadius: 10, padding: "1rem 1.25rem", display: "flex", gap: 14, alignItems: "flex-start" }}>
-            <div style={{ width: 36, height: 36, borderRadius: 8, background: TEAL_LIGHT, border: `0.5px solid ${TEAL_MID}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              <SvgIcon name={s.icon} size={18} />
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 14, fontWeight: 500, color: TEAL_DARK, marginBottom: 3 }}>{s.title}</div>
-              <div style={{ fontSize: 13, color: "#555", lineHeight: 1.6, marginBottom: 8 }}>{s.body}</div>
-              {s.href ? <a href={s.href} target="_blank" rel="noreferrer" style={{ fontSize: 13, color: TEAL, fontWeight: 500, textDecoration: "none" }}>{s.actionLabel}</a>
-                : <button onClick={s.onClick} style={{ background: "none", border: "none", padding: 0, fontSize: 13, color: TEAL, fontWeight: 500, cursor: "pointer" }}>{s.actionLabel}</button>}
-            </div>
+        <div style={{ background: "#fff", border: "0.5px solid #c8e6dc", borderRadius: 10, padding: "1rem 1.25rem", display: "flex", gap: 14, alignItems: "flex-start" }}>
+          <div style={{ width: 36, height: 36, borderRadius: 8, background: TEAL_LIGHT, border: `0.5px solid ${TEAL_MID}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <SvgIcon name="link" size={18} />
           </div>
-        ))}
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 500, color: TEAL_DARK, marginBottom: 3 }}>Share this site</div>
+            <div style={{ fontSize: 13, color: "#555", lineHeight: 1.6 }}>Know someone who's been treated with AI medical tools? Send them to meddisclosure.org so they can look up their device too.</div>
+          </div>
+        </div>
+        <div style={{ background: "#fff", border: "0.5px solid #c8e6dc", borderRadius: 10, padding: "1rem 1.25rem", display: "flex", gap: 14, alignItems: "flex-start" }}>
+          <div style={{ width: 36, height: 36, borderRadius: 8, background: TEAL_LIGHT, border: `0.5px solid ${TEAL_MID}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <SvgIcon name="bank" size={18} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 14, fontWeight: 500, color: TEAL_DARK, marginBottom: 3 }}>Tell your representatives</div>
+            <div style={{ fontSize: 13, color: "#555", lineHeight: 1.6, marginBottom: 8 }}>Right now, companies aren't required to share this information publicly. Your representatives can change that — let them know you care.</div>
+            <button onClick={() => setShowPatientEmail(v => !v)} style={{ background: "none", border: "none", padding: 0, fontSize: 13, color: TEAL, fontWeight: 500, cursor: "pointer" }}>
+              {showPatientEmail ? "Hide email draft" : "Draft an email →"}
+            </button>
+            {showPatientEmail && <EmailDraft audience="patient" />}
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
 function ProvidersPage({ onDownload }) {
+  const [providerCount, setProviderCount] = useState(847);
   const [providerClicked, setProviderClicked] = useState(false);
   const [openCase, setOpenCase] = useState(null);
   const [showEmail, setShowEmail] = useState(false);
-  const count = 847;
+
+  useEffect(() => {
+    fetch("/api/supporters")
+      .then(r => r.json())
+      .then(d => setProviderCount(d.count))
+      .catch(() => {});
+  }, []);
+
+  function handleSupport() {
+    if (providerClicked) return;
+    setProviderClicked(true);
+    fetch("/api/supporters", { method: "POST" })
+      .then(r => r.json())
+      .then(d => setProviderCount(d.count))
+      .catch(() => setProviderCount(c => c + 1));
+  }
 
   return (
     <div style={{ maxWidth: 680, margin: "0 auto", padding: "3rem 2rem" }}>
@@ -365,10 +400,7 @@ function ProvidersPage({ onDownload }) {
         </div>
         {[
           { icon: "warn", title: "The problem", body: "Fewer than 1 in 4 FDA-cleared AI devices disclose who they were validated on. There's no regulatory requirement to say so. The public 510(k) summary — the only document you can access — doesn't require it." },
-          {
-            icon: "eye", title: "Why it matters for your practice", body: "If a device was trained on a narrow population and deployed on yours, you have no way to know its limitations for the patient in front of you.",
-            expandable: true
-          },
+          { icon: "eye", title: "Why it matters for your practice", body: "If a device was trained on a narrow population and deployed on yours, you have no way to know its limitations for the patient in front of you.", expandable: true },
           { icon: "tool", title: "The fix", body: "Amend 21 CFR 807.92 to require a standardized Model Card in every AI/ML 510(k) summary. This is structured public reporting of data manufacturers already hold internally. It's the nutrition label, not the recipe." },
         ].map((item) => (
           <div key={item.title}>
@@ -409,9 +441,9 @@ function ProvidersPage({ onDownload }) {
             </div>
           </div>
         ))}
-        <button onClick={onDownload} style={{ background: "none", border: `0.5px solid ${TEAL_MID}`, borderRadius: 7, padding: "7px 14px", fontSize: 13, color: TEAL_DARK, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}>
+        <a href="/memo.pdf" target="_blank" rel="noreferrer" onClick={() => fetch("/api/downloads", { method: "POST" }).catch(() => {})} style={{ background: "none", border: `0.5px solid ${TEAL_MID}`, borderRadius: 7, padding: "7px 14px", fontSize: 13, color: TEAL_DARK, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6, textDecoration: "none" }}>
           <SvgIcon name="download" size={14} /> Download full memo
-        </button>
+        </a>
       </div>
 
       <div style={{ marginBottom: "1.5rem" }}>
@@ -437,51 +469,17 @@ function ProvidersPage({ onDownload }) {
 
       <div style={{ background: TEAL_LIGHT, border: `0.5px solid ${TEAL_MID}`, borderRadius: 12, padding: "1.5rem", textAlign: "center" }}>
         <SvgIcon name="users" size={28} color={TEAL} />
-        <div style={{ fontSize: 28, fontWeight: 500, color: TEAL, margin: "4px 0" }}>{providerClicked ? count + 1 : count}</div>
+        <div style={{ fontSize: 28, fontWeight: 500, color: TEAL, margin: "4px 0" }}>{providerCount}</div>
         <div style={{ fontSize: 13, color: TEAL_DARK, marginBottom: 16 }}>providers have signaled support for mandatory AI disclosure</div>
         <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
-          <button onClick={() => setProviderClicked(true)} style={{ background: providerClicked ? "#d0f0e5" : TEAL, color: providerClicked ? TEAL_DARK : "#fff", border: "none", borderRadius: 7, padding: "9px 20px", fontSize: 14, fontWeight: 500, cursor: providerClicked ? "default" : "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}>
+          <button onClick={handleSupport} disabled={providerClicked} style={{ background: providerClicked ? "#d0f0e5" : TEAL, color: providerClicked ? TEAL_DARK : "#fff", border: "none", borderRadius: 7, padding: "9px 20px", fontSize: 14, fontWeight: 500, cursor: providerClicked ? "default" : "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}>
             <SvgIcon name={providerClicked ? "check" : "thumb"} size={15} color={providerClicked ? TEAL_DARK : "#fff"} />
             {providerClicked ? "Counted" : "I support this →"}
           </button>
-          <a href="https://www.house.gov/representatives/find-your-representative" target="_blank" rel="noreferrer" style={{ background: "#fff", color: TEAL_DARK, border: `0.5px solid ${TEAL_MID}`, borderRadius: 7, padding: "9px 20px", fontSize: 14, fontWeight: 500, cursor: "pointer", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6 }}>
+          <a href="https://www.house.gov/representatives/find-your-representative" target="_blank" rel="noreferrer" style={{ background: "#fff", color: TEAL_DARK, border: `0.5px solid ${TEAL_MID}`, borderRadius: 7, padding: "9px 20px", fontSize: 14, fontWeight: 500, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6 }}>
             <SvgIcon name="pin" size={14} /> Find my representative
           </a>
         </div>
-      </div>
-    </div>
-  );
-}
-
-function EmailDraft({ audience }) {
-  const [copied, setCopied] = useState(false);
-  const subject = "Support Mandatory AI Transparency in FDA-Cleared Medical Devices";
-  const body = audience === "patient"
-    ? `Dear [Representative's Name],\n\nI am a constituent writing to urge your support for mandatory transparency requirements for AI-enabled medical devices cleared by the FDA.\n\nI recently learned that over 1,451 AI/ML medical devices have been cleared by the FDA, yet fewer than 1 in 4 disclose who they were tested on. As a patient, I have no way to know whether the AI tools used in my care were ever tested on people like me.\n\nI urge you to direct the FDA to require manufacturers to publicly disclose the demographic makeup of their AI device testing data. This is a simple fix — the data already exists. Patients just can't see it.\n\nFor more information, please visit: meddisclosure.org\n\nThank you for your time.\n\nSincerely,\n[Your Name]\n[Your City, State]`
-    : audience === "provider"
-    ? `Dear [Representative's Name],\n\nI am a healthcare provider writing to urge your support for mandatory transparency requirements for AI-enabled medical devices cleared by the FDA.\n\nOver 1,451 AI/ML medical devices have been cleared by the FDA, yet fewer than 1 in 4 disclose any information about the demographic composition of their validation data. As a clinician, I have no reliable way to know whether the AI tools I use daily were ever tested on patients who look like mine.\n\nI urge you to direct the FDA to amend 21 CFR 807.92 to require a standardized "Model Card" disclosure in every public 510(k) summary for AI/ML devices. This is a narrow, low-burden fix — manufacturers already collect this data internally. It simply requires them to make it public.\n\nFor more information, please visit: meddisclosure.ai\n\nThank you for your time and leadership on this issue.\n\nSincerely,\n[Your Name]\n[Your Institution]\n[Your State]`
-    : `Dear [Representative's Name],\n\nI am writing to urge your support for mandatory transparency requirements for AI-enabled medical devices cleared by the FDA.\n\nOver 1,451 AI/ML medical devices have been cleared by the FDA, yet fewer than 1 in 4 disclose who they were tested on. Documented cases — including a commercial algorithm that cut Black patients' access to care management by more than half, and pulse oximeters that gave dangerously inaccurate readings for Black patients during COVID-19 — show the real-world consequences of this gap.\n\nThe fix is straightforward: amend 21 CFR 807.92 to require a standardized "Model Card" in every public 510(k) summary for AI/ML devices. This requires no new data collection — manufacturers already hold this information internally. The EU AI Act will require this documentation for European regulators beginning in 2026. American patients deserve the same transparency.\n\nFor more information and the full policy brief, please visit: meddisclosure.ai\n\nThank you for your attention to this important issue.\n\nSincerely,\n[Your Name]\n[Your State]`;
-
-  function copy() {
-    navigator.clipboard?.writeText(`Subject: ${subject}\n\n${body}`);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
-
-  return (
-    <div style={{ marginTop: 10, background: "#fff", border: `0.5px solid ${TEAL_MID}`, borderRadius: 8, overflow: "hidden" }}>
-      <div style={{ background: TEAL_LIGHT, padding: "8px 12px", fontSize: 12, fontWeight: 500, color: TEAL_DARK, borderBottom: `0.5px solid ${TEAL_MID}` }}>
-        Subject: {subject}
-      </div>
-      <pre style={{ margin: 0, padding: "12px", fontSize: 12, color: "#444", lineHeight: 1.7, whiteSpace: "pre-wrap", fontFamily: "inherit" }}>{body}</pre>
-      <div style={{ padding: "8px 12px", borderTop: `0.5px solid #d0e8e1`, display: "flex", gap: 8 }}>
-        <button onClick={copy} style={{ background: copied ? "#d0f0e5" : TEAL, color: copied ? TEAL_DARK : "#fff", border: "none", borderRadius: 6, padding: "5px 12px", fontSize: 12, fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 5 }}>
-          <SvgIcon name={copied ? "check" : "notes"} size={12} color={copied ? TEAL_DARK : "#fff"} />
-          {copied ? "Copied!" : "Copy to clipboard"}
-        </button>
-        <a href={`https://www.house.gov/representatives/find-your-representative`} target="_blank" rel="noreferrer" style={{ background: "none", border: `0.5px solid ${TEAL_MID}`, borderRadius: 6, padding: "5px 12px", fontSize: 12, color: TEAL, fontWeight: 500, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 5 }}>
-          <SvgIcon name="pin" size={12} /> Find your rep →
-        </a>
       </div>
     </div>
   );
@@ -506,7 +504,7 @@ function PolicyPage({ downloads, onDownload }) {
         <div style={{ display: "flex", gap: 16, maxWidth: 720, margin: "0 auto", flexWrap: "wrap" }}>
           {STATS.map(s => <StatCard key={s.num} {...s} />)}
           <div style={{ flex: 1, minWidth: 160, background: "#fff", border: `2px solid ${TEAL_MID}`, borderRadius: 12, padding: "1.25rem 1.5rem", textAlign: "center" }}>
-            <div style={{ fontSize: 32, fontWeight: 500, color: TEAL, letterSpacing: "-1px" }}>{downloads}</div>
+            <div style={{ fontSize: 32, fontWeight: 500, color: TEAL, letterSpacing: "-1px" }}>{downloads ?? "—"}</div>
             <div style={{ fontSize: 13, color: "#555", marginTop: 4, lineHeight: 1.4 }}>policy memo downloads</div>
           </div>
         </div>
@@ -570,11 +568,11 @@ function PolicyPage({ downloads, onDownload }) {
         <div style={{ background: TEAL, borderRadius: 12, padding: "2rem", textAlign: "center", marginTop: "2.5rem", marginBottom: "1rem" }}>
           <SvgIcon name="gavel" size={28} color="#9FE1CB" />
           <div style={{ fontSize: 18, fontWeight: 500, color: "#fff", margin: "10px 0 8px" }}>Direct FDA to initiate rulemaking within 12 months.</div>
-          <div style={{ fontSize: 13, color: "#9FE1CB", marginBottom: 20, lineHeight: 1.6 }}>With statutory fallback language under FD&C Act § 510 ready if FDA does not act.<br />EU AI Act documentation requirements take effect in 2026–2027 regardless. The question is whether American patients receive the same protections.</div>
+          <div style={{ fontSize: 13, color: "#9FE1CB", marginBottom: 20, lineHeight: 1.6 }}>With statutory fallback language under FD&C Act § 510 ready if FDA does not act.<br />EU AI Act documentation requirements take effect in 2026–2027 regardless.</div>
           <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap", marginBottom: showEmail ? 16 : 0 }}>
-            <button onClick={onDownload} style={{ background: "#fff", color: TEAL_DARK, border: "none", borderRadius: 7, padding: "9px 20px", fontSize: 14, fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}>
+            <a href="/memo.pdf" target="_blank" rel="noreferrer" onClick={() => fetch("/api/downloads", { method: "POST" }).catch(() => {})} style={{ background: "#fff", color: TEAL_DARK, border: "none", borderRadius: 7, padding: "9px 20px", fontSize: 14, fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6, textDecoration: "none" }}>
               <SvgIcon name="download" size={14} color={TEAL_DARK} /> Download full memo
-            </button>
+            </a>
             <button onClick={() => setShowEmail(v => !v)} style={{ background: "transparent", color: "#fff", border: "0.5px solid rgba(255,255,255,0.5)", borderRadius: 7, padding: "9px 20px", fontSize: 14, fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}>
               <SvgIcon name="mail" size={14} color="#fff" /> {showEmail ? "Hide email draft" : "Draft a rep email →"}
             </button>
@@ -588,36 +586,27 @@ function PolicyPage({ downloads, onDownload }) {
 
 export default function App() {
   const [page, setPage] = useState("Home");
-  const [downloads, setDownloads] = useState(128);
+  const [downloads, setDownloads] = useState(null);
 
   useEffect(() => {
     fetch("/api/downloads")
       .then(r => r.json())
       .then(d => setDownloads(d.count))
-      .catch(() => {});
+      .catch(() => setDownloads(128));
   }, []);
 
-  async function handleDownload() {
-    window.open("/memo.pdf", "_blank");
-    fetch("/api/downloads", { method: "POST" })
-      .then(r => r.json())
-      .then(d => setDownloads(d.count))
-      .catch(() => setDownloads(prev => prev + 1));
-  }
-
   function handleSetPage(p) {
-    if (p === "__download__") { handleDownload(); return; }
     setPage(p);
   }
 
   return (
-    <div style={{ fontFamily: "var(--font-sans)", background: "#fff", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+    <div style={{ fontFamily: "system-ui, sans-serif", background: "#fff", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <NavBar page={page} setPage={handleSetPage} />
       <div style={{ flex: 1 }}>
         {page === "Home" && <HomePage setPage={handleSetPage} downloads={downloads} />}
         {page === "Patients" && <PatientsPage />}
-        {page === "Providers" && <ProvidersPage onDownload={handleDownload} />}
-        {page === "Policy Makers" && <PolicyPage downloads={downloads} onDownload={handleDownload} />}
+        {page === "Providers" && <ProvidersPage />}
+        {page === "Policy Makers" && <PolicyPage downloads={downloads} />}
       </div>
       <Footer setPage={handleSetPage} />
     </div>
