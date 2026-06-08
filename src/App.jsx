@@ -154,7 +154,7 @@ function Footer({ setPage }) {
         </div>
       </div>
       <div style={{ maxWidth: 720, margin: "1.5rem auto 0", paddingTop: "1rem", borderTop: "0.5px solid rgba(255,255,255,0.15)", fontSize: 12, color: "#9FE1CB", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
-        <span>© 2025 MedDisclosure.org · Wes Krikorian</span>
+        <span>© 2026 MedDisclosure.org · Wes Krikorian</span>
         <span>Not affiliated with the FDA or any device manufacturer.</span>
       </div>
     </footer>
@@ -305,9 +305,14 @@ function PatientsPage() {
 
       <div style={{ background: "#fff", border: "0.5px solid #c8e6dc", borderRadius: 12, padding: "1.5rem", marginBottom: "2rem" }}>
         <div style={{ fontSize: 13, fontWeight: 500, color: TEAL_DARK, marginBottom: 4, display: "flex", alignItems: "center", gap: 6 }}>
-          Look up your device <InfoTooltip text="A 510(k) number is the ID the FDA gives a medical device when it's approved for sale in the US. It starts with the letter K followed by 6 numbers — like K213929. You can find it on your medical paperwork, or just search by company or product name." />
+          Look up your device's Model Card <InfoTooltip text="A Model Card is a public document that describes how an AI device was built and tested. Not all devices have one — that's the gap we're working to fix." />
         </div>
-        <p style={{ fontSize: 13, color: "#777", margin: "0 0 10px" }}>Type in the company name, device name, or the ID number from your paperwork (starts with "K" and some numbers).</p>
+        <p style={{ fontSize: 13, color: "#777", margin: "0 0 10px" }}>
+          Enter the 510(k) number from your medical paperwork (starts with "K" followed by numbers). Not sure what device was used?{" "}
+          <a href="https://www.fda.gov/medical-devices/software-medical-device-samd/artificial-intelligence-enabled-medical-devices" target="_blank" rel="noreferrer" style={{ color: TEAL, fontWeight: 500 }}>
+            Search the FDA's AI device list by company name →
+          </a>
+        </p>
         <div style={{ display: "flex", gap: 8 }}>
           <input value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSearch()} placeholder="e.g. Aidoc, Viz.ai, or K213929" style={{ flex: 1, padding: "9px 12px", borderRadius: 7, border: "0.5px solid #c8e6dc", fontSize: 14, outline: "none" }} />
           <button onClick={handleSearch} disabled={loading} style={{ background: TEAL, color: "#fff", border: "none", borderRadius: 7, padding: "9px 18px", fontSize: 14, fontWeight: 500, cursor: loading ? "default" : "pointer", opacity: loading ? 0.7 : 1, display: "inline-flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}>
