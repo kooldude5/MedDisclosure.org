@@ -1,5 +1,6 @@
-import { kv } from "@vercel/kv";
+import { Redis } from "@upstash/redis";
 
+const redis = Redis.fromEnv();
 const KEY = "memo_downloads";
 const SEED = 128;
 
@@ -12,17 +13,18 @@ export default async function handler(req, res) {
 
   try {
     if (req.method === "GET") {
-      const count = await kv.get(KEY);
+      const count = await redis.get(KEY);
       return res.status(200).json({ count: count ?? SEED });
     }
     if (req.method === "POST") {
-      const next = await kv.incr(KEY);
-      const count = next === 1 ? await kv.incrby(KEY, SEED - 1) : next;
-      return res.status(200).json({ count });
+      const exists = await redis.exists(KEY);
+      if (!exists) await redis.set(KEY, SEED);
+      const next = await redis.incr(KEY);
+      return res.status(200).json({ count: next });
     }
     return res.status(405).json({ error: "Method not allowed" });
   } catch (err) {
-    console.error("KV error:", err);
+    console.error("Redis error:", err);
     return res.status(500).json({ error: "Storage error" });
   }
 }
