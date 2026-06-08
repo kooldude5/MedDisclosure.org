@@ -321,9 +321,9 @@ If no matching device is found, write two short plain paragraphs under the same 
       <h3 style={{ fontSize: 15, fontWeight: 500, color: TEAL_DARK, marginBottom: "1rem" }}>What you can do next</h3>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {[
-          { icon: "link", title: "Share this site", body: "Know someone who's been treated with AI medical tools? Send them this page so they can look up their device too.", actionLabel: "Copy link",       onClick: () => navigator.clipboard?.writeText("meddisclosure.org") },
+          { icon: "link", title: "Share this site", body: "Know someone who's been treated with AI medical tools? Send them this page so they can look up their device too."},
           { icon: "bank", title: "Tell your representatives", body: "Right now, companies aren't required to share this information publicly. Your representatives can change that.", actionLabel: "Find my rep →", href: "https://www.house.gov/representatives/find-your-representative" },
-          { icon: "heart", title: "Advocate for transparency", body: "Read our policy page to understand what we're asking for — and share it with anyone who works in healthcare or government.", actionLabel: "Read the policy →" },
+          { icon: "heart", title: "Advocate for transparency", body: "Read our policy page to understand what we're asking for — and share it with anyone who works in healthcare or government."},
         ].map((s, i) => (
           <div key={i} style={{ background: "#fff", border: "0.5px solid #c8e6dc", borderRadius: 10, padding: "1rem 1.25rem", display: "flex", gap: 14, alignItems: "flex-start" }}>
             <div style={{ width: 36, height: 36, borderRadius: 8, background: TEAL_LIGHT, border: `0.5px solid ${TEAL_MID}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
