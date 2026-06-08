@@ -239,31 +239,15 @@ function PatientsPage() {
     setLoading(true); setResult(null);
     try {
       setLoadingStep("Searching the FDA device database…");
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
+      const res = await fetch("/api/lookup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514", max_tokens: 1000,
-          tools: [{ type: "web_search_20250305", name: "web_search" }],
-          messages: [{ role: "user",           content: `You are a medical AI transparency assistant helping a patient look up an FDA-cleared AI medical device. The patient searched for: "${query}".
-
-Step 1: Search the FDA's AI-enabled medical devices list at https://www.fda.gov/medical-devices/software-medical-device-samd/artificial-intelligence-enabled-medical-devices to find a matching device.
-Step 2: Retrieve and read its 510(k) summary from the FDA database.
-Step 3: Do not narrate your search process, do not explain what you are doing, do not say what you found or didn't find along the way. Go silent until you have the answer, then write your response in exactly this format — two labeled paragraphs, plain prose only, no bullet points, no headers with colons acting as titles, no emojis, no markdown:
-
-What is this device?
-[One plain paragraph. Explain what the device does in simple everyday language, who made it, and when the FDA cleared it. Write like you're explaining it to a friend, not a doctor.]
-
-Who was it trained on?
-[One plain paragraph. State exactly what demographic information the manufacturer disclosed about the patients used to test or train this AI — age, sex, race, ethnicity, geography, dataset size. If any of this was not disclosed, say so plainly and note that this is the transparency gap MedDisclosure.org is working to fix.]
-
-If no matching device is found, write two short plain paragraphs under the same headers explaining that and suggesting the patient ask their care provider for the exact device name or 510(k) number.` }]
-        })
+        body: JSON.stringify({ query }),
       });
       setLoadingStep("Reading the FDA summary document…");
       const data = await res.json();
-      const text = (data.content || []).filter(b => b.type === "text").map(b => b.text).join("\n").trim();
-      setResult(text || "We couldn't find that device right now. Try the exact company name or device name from your paperwork.");
+      const text = data.result || "We couldn't find that device right now.";
+      setResult(text);
     } catch { setResult("Something went wrong. Please try again in a moment."); }
     setLoading(false); setLoadingStep("");
   }
