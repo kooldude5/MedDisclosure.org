@@ -260,11 +260,10 @@ Who was it trained on?
 If no matching device is found, write two short plain paragraphs under the same headers explaining that and suggesting the patient ask their care provider for the exact device name or 510(k) number.` }]
         })
       });
-      const res = await fetch("/api/lookup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query }),
-      });
+      setLoadingStep("Reading the FDA summary document…");
+      const data = await res.json();
+      const text = (data.content || []).filter(b => b.type === "text").map(b => b.text).join("\n").trim();
+      setResult(text || "We couldn't find that device right now. Try the exact company name or device name from your paperwork.");
     } catch { setResult("Something went wrong. Please try again in a moment."); }
     setLoading(false); setLoadingStep("");
   }
