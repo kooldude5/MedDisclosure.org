@@ -121,7 +121,7 @@ function NavBar({ page, setPage }) {
   return (
     <nav style={{ borderBottom: "0.5px solid #d0e8e1", padding: "0 2rem", display: "flex", alignItems: "center", justifyContent: "space-between", height: 56, background: "#fff" }}>
       <button onClick={() => setPage("Home")} style={{ background: "none", border: "none", cursor: "pointer" }}>
-        <span style={{ fontWeight: 500, fontSize: 15, color: TEAL_DARK, letterSpacing: "-0.3px" }}>MedDisclosure<span style={{ color: TEAL_MID }}>.ai</span></span>
+        <span style={{ fontWeight: 500, fontSize: 15, color: TEAL_DARK, letterSpacing: "-0.3px" }}>MedDisclosure<span style={{ color: TEAL_MID }}>.org</span></span>
       </button>
       <div style={{ display: "flex", gap: 4 }}>
         {NAV_LINKS.map(l => (
@@ -137,7 +137,7 @@ function Footer({ setPage }) {
     <footer style={{ borderTop: `0.5px solid ${TEAL_DARK}`, background: TEAL, padding: "2.5rem 2rem 2rem" }}>
       <div style={{ maxWidth: 720, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr auto", gap: "2rem", alignItems: "start" }}>
         <div>
-          <div style={{ fontWeight: 500, fontSize: 15, color: "#fff", marginBottom: 6 }}>MedDisclosure<span style={{ color: "#9FE1CB" }}>.ai</span></div>
+          <div style={{ fontWeight: 500, fontSize: 15, color: "#fff", marginBottom: 6 }}>MedDisclosure<span style={{ color: "#9FE1CB" }}>.org</span></div>
           <p style={{ fontSize: 13, color: "#9FE1CB", lineHeight: 1.7, maxWidth: 400, margin: "0 0 10px" }}>
             An independent advocacy project calling for mandatory transparency in FDA-cleared AI/ML medical devices. Built and maintained by <span style={{ fontWeight: 500, color: "#fff" }}>Wes Krikorian</span>.
           </p>
@@ -245,7 +245,19 @@ function PatientsPage() {
         body: JSON.stringify({
           model: "claude-sonnet-4-20250514", max_tokens: 1000,
           tools: [{ type: "web_search_20250305", name: "web_search" }],
-          messages: [{ role: "user", content: `You are a medical AI transparency assistant helping a patient look up an FDA-cleared AI medical device. The patient searched for: "${query}". Step 1: Search the FDA's AI-enabled medical devices list at https://www.fda.gov/medical-devices/software-medical-device-samd/artificial-intelligence-enabled-medical-devices to find a matching device. Step 2: Retrieve and read its 510(k) summary from the FDA database. Step 3: Write a plain-English summary for a patient (not a doctor) that covers: what this device does simply, who made it and when approved, who the AI was tested on (if reported say so; if not say "The manufacturer did not publicly disclose this information, which is a transparency gap this website is working to fix."), and one question the patient should ask their doctor. Write at a 6th-grade reading level. Be warm, clear, and honest. If no device found, say so and suggest they ask their care provider for the exact device name or 510(k) number (starts with K followed by numbers).` }]
+          messages: [{ role: "user",           content: `You are a medical AI transparency assistant helping a patient look up an FDA-cleared AI medical device. The patient searched for: "${query}".
+
+Step 1: Search the FDA's AI-enabled medical devices list at https://www.fda.gov/medical-devices/software-medical-device-samd/artificial-intelligence-enabled-medical-devices to find a matching device.
+Step 2: Retrieve and read its 510(k) summary from the FDA database.
+Step 3: Do not narrate your search process, do not explain what you are doing, do not say what you found or didn't find along the way. Go silent until you have the answer, then write your response in exactly this format — two labeled paragraphs, plain prose only, no bullet points, no headers with colons acting as titles, no emojis, no markdown:
+
+What is this device?
+[One plain paragraph. Explain what the device does in simple everyday language, who made it, and when the FDA cleared it. Write like you're explaining it to a friend, not a doctor.]
+
+Who was it trained on?
+[One plain paragraph. State exactly what demographic information the manufacturer disclosed about the patients used to test or train this AI — age, sex, race, ethnicity, geography, dataset size. If any of this was not disclosed, say so plainly and note that this is the transparency gap MedDisclosure.org is working to fix.]
+
+If no matching device is found, write two short plain paragraphs under the same headers explaining that and suggesting the patient ask their care provider for the exact device name or 510(k) number.` }]
         })
       });
       setLoadingStep("Reading the FDA summary document…");
@@ -309,7 +321,7 @@ function PatientsPage() {
       <h3 style={{ fontSize: 15, fontWeight: 500, color: TEAL_DARK, marginBottom: "1rem" }}>What you can do next</h3>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {[
-          { icon: "link", title: "Share this site", body: "Know someone who's been treated with AI medical tools? Send them this page so they can look up their device too.", actionLabel: "Copy link", onClick: () => navigator.clipboard?.writeText("meddisclosure.ai") },
+          { icon: "link", title: "Share this site", body: "Know someone who's been treated with AI medical tools? Send them this page so they can look up their device too.", actionLabel: "Copy link",       onClick: () => navigator.clipboard?.writeText("meddisclosure.org") },
           { icon: "bank", title: "Tell your representatives", body: "Right now, companies aren't required to share this information publicly. Your representatives can change that.", actionLabel: "Find my rep →", href: "https://www.house.gov/representatives/find-your-representative" },
           { icon: "heart", title: "Advocate for transparency", body: "Read our policy page to understand what we're asking for — and share it with anyone who works in healthcare or government.", actionLabel: "Read the policy →" },
         ].map((s, i) => (
@@ -444,7 +456,9 @@ function ProvidersPage({ onDownload }) {
 function EmailDraft({ audience }) {
   const [copied, setCopied] = useState(false);
   const subject = "Support Mandatory AI Transparency in FDA-Cleared Medical Devices";
-  const body = audience === "provider"
+  const body = audience === "patient"
+    ? `Dear [Representative's Name],\n\nI am a constituent writing to urge your support for mandatory transparency requirements for AI-enabled medical devices cleared by the FDA.\n\nI recently learned that over 1,451 AI/ML medical devices have been cleared by the FDA, yet fewer than 1 in 4 disclose who they were tested on. As a patient, I have no way to know whether the AI tools used in my care were ever tested on people like me.\n\nI urge you to direct the FDA to require manufacturers to publicly disclose the demographic makeup of their AI device testing data. This is a simple fix — the data already exists. Patients just can't see it.\n\nFor more information, please visit: meddisclosure.org\n\nThank you for your time.\n\nSincerely,\n[Your Name]\n[Your City, State]`
+    : audience === "provider"
     ? `Dear [Representative's Name],\n\nI am a healthcare provider writing to urge your support for mandatory transparency requirements for AI-enabled medical devices cleared by the FDA.\n\nOver 1,451 AI/ML medical devices have been cleared by the FDA, yet fewer than 1 in 4 disclose any information about the demographic composition of their validation data. As a clinician, I have no reliable way to know whether the AI tools I use daily were ever tested on patients who look like mine.\n\nI urge you to direct the FDA to amend 21 CFR 807.92 to require a standardized "Model Card" disclosure in every public 510(k) summary for AI/ML devices. This is a narrow, low-burden fix — manufacturers already collect this data internally. It simply requires them to make it public.\n\nFor more information, please visit: meddisclosure.ai\n\nThank you for your time and leadership on this issue.\n\nSincerely,\n[Your Name]\n[Your Institution]\n[Your State]`
     : `Dear [Representative's Name],\n\nI am writing to urge your support for mandatory transparency requirements for AI-enabled medical devices cleared by the FDA.\n\nOver 1,451 AI/ML medical devices have been cleared by the FDA, yet fewer than 1 in 4 disclose who they were tested on. Documented cases — including a commercial algorithm that cut Black patients' access to care management by more than half, and pulse oximeters that gave dangerously inaccurate readings for Black patients during COVID-19 — show the real-world consequences of this gap.\n\nThe fix is straightforward: amend 21 CFR 807.92 to require a standardized "Model Card" in every public 510(k) summary for AI/ML devices. This requires no new data collection — manufacturers already hold this information internally. The EU AI Act will require this documentation for European regulators beginning in 2026. American patients deserve the same transparency.\n\nFor more information and the full policy brief, please visit: meddisclosure.ai\n\nThank you for your attention to this important issue.\n\nSincerely,\n[Your Name]\n[Your State]`;
 
