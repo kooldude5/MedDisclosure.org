@@ -265,6 +265,7 @@ function PatientsPage() {
   const [result, setResult] = useState(null);
   const [devices, setDevices] = useState([]);
   const [dbLoaded, setDbLoaded] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [showPatientEmail, setShowPatientEmail] = useState(false);
 
   useEffect(() => {
@@ -287,6 +288,7 @@ function PatientsPage() {
 
   function handleSearch() {
     if (!query.trim() || !devices.length) return;
+    setLoading(true);
     setResult(null);
     const q = query.trim().toLowerCase();
     const match = devices.find(d =>
@@ -294,6 +296,7 @@ function PatientsPage() {
       (d["Device Name"] || "").toLowerCase().includes(q) ||
       (d["Company Name"] || "").toLowerCase().includes(q)
     );
+    setLoading(false);
     if (!match) { setResult({ notFound: true }); return; }
     setResult(match);
   }
