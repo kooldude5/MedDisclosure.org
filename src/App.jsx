@@ -268,7 +268,7 @@ function PatientsPage() {
 
   useEffect(() => {
     import("https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js").then(() => {
-      window.Papa.parse("/devices.csv", {
+      window.Papa.parse("https://e3mudghoy8iausqu.public.blob.vercel-storage.com/devices.csv", {
         download: true,
         header: true,
         skipEmptyLines: true,
