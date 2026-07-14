@@ -291,6 +291,7 @@ function PatientsPage() {
     setLoading(true);
     setResult(null);
     const q = query.trim().toLowerCase();
+    if (q.length < 3) { setResult({ notFound: true }); setLoading(false); return; }
     const match = devices.find(d =>
       (d["Submission Number (K Number)"] || "").toLowerCase().replace(/\s/g, "").includes(q.replace(/\s/g, "")) ||
       (d["Device Name"] || "").toLowerCase().includes(q) ||
@@ -368,7 +369,7 @@ function PatientsPage() {
                 </div>
               ))}
               <div>
-                <div style={{ fontSize: 11, fontWeight: 600, color: TEAL, textTransform: "uppercase", letterSpacing: "0.4px", marginBottom: 2 }}>Who was it trained on?</div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: TEAL, textTransform: "uppercase", letterSpacing: "0.4px", marginBottom: 2 }}>Summary</div>
                 <div style={{ fontSize: 13, color: TEAL_DARK, lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
                   {result["Model Description & Demographics (Race, Age, Gender, Geography)"] || "No demographic information was disclosed by the manufacturer. This is the transparency gap MedDisclosure.org is working to fix."}
                 </div>
