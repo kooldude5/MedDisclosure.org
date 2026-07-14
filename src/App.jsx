@@ -295,28 +295,23 @@ function PatientsPage() {
   const [showPatientEmail, setShowPatientEmail] = useState(false);
 
   useEffect(() => {
-    fetch("/devices.csv")
-      .then(r => r.text())
-      .then(text => {
-        const rows = parseCSV(text);
-        if (rows.length < 2) return;
-        const hdrs = rows[0].map(h => h.trim());
-        setHeaders(hdrs);
-        const parsed = rows.slice(1).map(row => {
-          const obj = {};
-          hdrs.forEach((h, i) => { obj[h] = (row[i] || "").trim(); });
-          return obj;
-        });
-        setDevices(parsed);
-        setDbLoaded(true);
-      })
-      .catch(() => setDbLoaded(false));
+    import("https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js").then(() => {
+      window.Papa.parse("/devices.csv", {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: ({ data }) => {
+          setDevices(data);
+          setDbLoaded(true);
+        },
+        error: () => setDbLoaded(false),
+      });
+    });
   }, []);
 
-  // Find the right column key case-insensitively
   function col(device, keyword) {
     const key = Object.keys(device).find(k => k.toLowerCase().includes(keyword.toLowerCase()));
-    return key ? device[key] : "";
+    return key ? (device[key] || "").trim() : "";
   }
 
   function handleSearch() {
@@ -324,10 +319,9 @@ function PatientsPage() {
     setResult(null);
     const q = query.trim().toLowerCase();
     const match = devices.find(d =>
-      col(d, "k number").toLowerCase().includes(q) ||
-      col(d, "submission number").toLowerCase().includes(q) ||
-      col(d, "device name").toLowerCase().includes(q) ||
-      col(d, "company name").toLowerCase().includes(q)
+      (d["Submission Number (K Number)"] || "").toLowerCase().replace(/\s/g, "").includes(q.replace(/\s/g, "")) ||
+      (d["Device Name"] || "").toLowerCase().includes(q) ||
+      (d["Company Name"] || "").toLowerCase().includes(q)
     );
     if (!match) { setResult({ notFound: true }); return; }
     setResult(match);
@@ -389,10 +383,10 @@ function PatientsPage() {
             </div>
             <div style={{ display: "grid", gap: 12 }}>
               {[
-                ["Device", col(result, "device name")],
-                ["Company", col(result, "company name")],
-                ["510(k) Number", col(result, "submission number") || col(result, "k number")],
-                ["Date Cleared", col(result, "date of submission") || col(result, "date")],
+                ["Device", result["Device Name"]],
+                ["Company", result["Company Name"]],
+                ["510(k) Number", result["Submission Number (K Number)"]],
+                ["Date Cleared", result["Date of Submission"]],
               ].filter(([, v]) => v).map(([label, val]) => (
                 <div key={label}>
                   <div style={{ fontSize: 11, fontWeight: 600, color: TEAL, textTransform: "uppercase", letterSpacing: "0.4px", marginBottom: 2 }}>{label}</div>
@@ -402,7 +396,7 @@ function PatientsPage() {
               <div>
                 <div style={{ fontSize: 11, fontWeight: 600, color: TEAL, textTransform: "uppercase", letterSpacing: "0.4px", marginBottom: 2 }}>Who was it trained on?</div>
                 <div style={{ fontSize: 13, color: TEAL_DARK, lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
-                  {col(result, "demographics") || col(result, "model description") || "No demographic information was disclosed by the manufacturer. This is the transparency gap MedDisclosure.org is working to fix."}
+                  {result["Model Description & Demographics (Race, Age, Gender, Geography)"] || "No demographic information was disclosed by the manufacturer. This is the transparency gap MedDisclosure.org is working to fix."}
                 </div>
               </div>
             </div>
