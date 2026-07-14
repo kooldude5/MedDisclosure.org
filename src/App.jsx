@@ -257,29 +257,76 @@ function HomePage({ setPage, downloads }) {
   );
 }
 
+function parseCSV(text) {
+  const rows = [];
+  let i = 0;
+  while (i < text.length) {
+    const row = [];
+    while (i < text.length && text[i] !== '\n') {
+      if (text[i] === '"') {
+        let cell = '';
+        i++;
+        while (i < text.length) {
+          if (text[i] === '"' && text[i+1] === '"') { cell += '"'; i += 2; }
+          else if (text[i] === '"') { i++; break; }
+          else { cell += text[i++]; }
+        }
+        row.push(cell);
+        if (text[i] === ',') i++;
+      } else {
+        let cell = '';
+        while (i < text.length && text[i] !== ',' && text[i] !== '\n') cell += text[i++];
+        row.push(cell.trim());
+        if (text[i] === ',') i++;
+      }
+    }
+    if (text[i] === '\n') i++;
+    if (row.length > 1 || row[0]) rows.push(row);
+  }
+  return rows;
+}
+
 function PatientsPage() {
   const [query, setQuery] = useState("");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [loadingStep, setLoadingStep] = useState("");
+  const [devices, setDevices] = useState([]);
+  const [dbLoaded, setDbLoaded] = useState(false);
   const [showPatientEmail, setShowPatientEmail] = useState(false);
 
-  async function handleSearch() {
-    if (!query.trim()) return;
+  useEffect(() => {
+    fetch("/devices.csv")
+      .then(r => r.text())
+      .then(text => {
+        const rows = parseCSV(text);
+        if (rows.length < 2) return;
+        const headers = rows[0].map(h => h.trim().toLowerCase());
+        const parsed = rows.slice(1).map(row => {
+          const obj = {};
+          headers.forEach((h, i) => obj[h] = row[i] || "");
+          return obj;
+        });
+        setDevices(parsed);
+        setDbLoaded(true);
+      })
+      .catch(() => setDbLoaded(false));
+  }, []);
+
+  function handleSearch() {
+    if (!query.trim() || !devices.length) return;
     setLoading(true); setResult(null);
-    try {
-      setLoadingStep("Searching the FDA device database…");
-      const res = await fetch("/api/lookup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query }),
-      });
-      setLoadingStep("Reading the FDA summary document…");
-      const data = await res.json();
-      const text = data.result || "We couldn't find that device right now. Try the exact company name or device name from your paperwork.";
-      setResult(text);
-    } catch { setResult("Something went wrong. Please try again in a moment."); }
-    setLoading(false); setLoadingStep("");
+    const q = query.trim().toLowerCase();
+    const match = devices.find(d =>
+      (d["submission number (k number)"] || "").toLowerCase().includes(q) ||
+      (d["device name"] || "").toLowerCase().includes(q) ||
+      (d["company name"] || "").toLowerCase().includes(q)
+    );
+    setLoading(false);
+    if (!match) {
+      setResult({ notFound: true });
+      return;
+    }
+    setResult(match);
   }
 
   return (
@@ -314,25 +361,56 @@ function PatientsPage() {
           </a>
         </p>
         <div style={{ display: "flex", gap: 8 }}>
-          <input value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSearch()} placeholder="e.g. Aidoc, Viz.ai, or K213929" style={{ flex: 1, padding: "9px 12px", borderRadius: 7, border: "0.5px solid #c8e6dc", fontSize: 14, outline: "none" }} />
-          <button onClick={handleSearch} disabled={loading} style={{ background: TEAL, color: "#fff", border: "none", borderRadius: 7, padding: "9px 18px", fontSize: 14, fontWeight: 500, cursor: loading ? "default" : "pointer", opacity: loading ? 0.7 : 1, display: "inline-flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}>
-            <SvgIcon name="search" size={14} color="#fff" /> {loading ? "Searching…" : "Look up"}
+          <input value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSearch()} placeholder="e.g. K213929 or device name" style={{ flex: 1, padding: "9px 12px", borderRadius: 7, border: "0.5px solid #c8e6dc", fontSize: 14, outline: "none" }} />
+          <button onClick={handleSearch} disabled={!dbLoaded} style={{ background: TEAL, color: "#fff", border: "none", borderRadius: 7, padding: "9px 18px", fontSize: 14, fontWeight: 500, cursor: dbLoaded ? "pointer" : "default", opacity: dbLoaded ? 1 : 0.5, display: "inline-flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}>
+            <SvgIcon name="search" size={14} color="#fff" /> Look up
           </button>
         </div>
-        {loading && (
-          <div style={{ marginTop: 12, fontSize: 13, color: TEAL, display: "flex", alignItems: "center", gap: 8 }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={TEAL} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ animation: "spin 1s linear infinite" }}><path d="M21 12a9 9 0 1 1 -9 -9"/></svg>
-            <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
-            {loadingStep}
+        {!dbLoaded && (
+          <div style={{ marginTop: 8, fontSize: 12, color: "#aaa" }}>Device database not loaded — make sure devices.csv is in the public folder.</div>
+        )}
+        {result && !loading && result.notFound && (
+          <div style={{ marginTop: "1.25rem", background: "#fff8f0", borderRadius: 8, padding: "1rem 1.25rem", border: "0.5px solid #f5c07a" }}>
+            <p style={{ fontSize: 14, color: "#7a4a00", lineHeight: 1.7, margin: 0 }}>
+              No matching device found. Try entering the exact 510(k) number (e.g. K213929) from your paperwork, or{" "}
+              <a href="https://www.fda.gov/medical-devices/software-medical-device-samd/artificial-intelligence-enabled-medical-devices" target="_blank" rel="noreferrer" style={{ color: TEAL, fontWeight: 500 }}>search the FDA's AI device list</a>
+              {" "}to find the K number first.
+            </p>
           </div>
         )}
-        {result && !loading && (
+        {result && !loading && !result.notFound && (
           <div style={{ marginTop: "1.25rem", background: TEAL_LIGHT, borderRadius: 8, padding: "1rem 1.25rem", border: "0.5px solid #9FE1CB" }}>
-            <div style={{ fontSize: 11, fontWeight: 500, color: TEAL, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 8, display: "flex", alignItems: "center", gap: 6 }}>
+            <div style={{ fontSize: 11, fontWeight: 500, color: TEAL, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
               <SvgIcon name="notes" size={13} /> FDA Device Summary
             </div>
-            <p style={{ fontSize: 14, color: TEAL_DARK, lineHeight: 1.75, margin: 0, whiteSpace: "pre-wrap" }}>{result}</p>
-            <p style={{ fontSize: 11, color: "#888", marginTop: 10, marginBottom: 0 }}>Summary generated from publicly available FDA documents. Always verify with your care team.</p>
+            <div style={{ display: "grid", gap: 10 }}>
+              {[
+                ["Device", result["device name"]],
+                ["Company", result["company name"]],
+                ["510(k) Number", result["submission number (k number)"]],
+                ["Date Cleared", result["date of submission"]],
+              ].filter(([,v]) => v).map(([label, val]) => (
+                <div key={label}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: TEAL, textTransform: "uppercase", letterSpacing: "0.4px", marginBottom: 2 }}>{label}</div>
+                  <div style={{ fontSize: 13, color: TEAL_DARK, lineHeight: 1.6 }}>{val}</div>
+                </div>
+              ))}
+              {result["model description & demographics (race, age, gender, geography)"] && (
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: TEAL, textTransform: "uppercase", letterSpacing: "0.4px", marginBottom: 2 }}>Who was it trained on?</div>
+                  <div style={{ fontSize: 13, color: TEAL_DARK, lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{result["model description & demographics (race, age, gender, geography)"]}</div>
+                </div>
+              )}
+              {result["summary text"] && (
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: TEAL, textTransform: "uppercase", letterSpacing: "0.4px", marginBottom: 2 }}>Summary</div>
+                  <div style={{ fontSize: 13, color: TEAL_DARK, lineHeight: 1.6 }}>{result["summary text"]}</div>
+                </div>
+              )}
+            </div>
+            <div style={{ marginTop: 12, padding: "10px 12px", background: "rgba(255,255,255,0.6)", borderRadius: 6, fontSize: 11, color: "#666", lineHeight: 1.6 }}>
+              ⚠️ These summaries were auto-extracted from the original FDA 510(k) documents using pattern-matching, not manual review. Demographic figures in particular were parsed from flattened PDF tables and may be incomplete or misattributed. Always confirm any figure against the original summary text (included in this file) or the source PDF before citing or acting on it.
+            </div>
           </div>
         )}
       </div>
