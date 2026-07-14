@@ -271,7 +271,7 @@ function parseCSV(text) {
           else if (text[i] === '"') { i++; break; }
           else { cell += text[i++]; }
         }
-        row.push(cell);
+        row.push(cell.trim());
         if (text[i] === ',') i++;
       } else {
         let cell = '';
@@ -281,7 +281,7 @@ function parseCSV(text) {
       }
     }
     if (text[i] === '\n') i++;
-    if (row.length > 1 || row[0]) rows.push(row);
+    if (row.some(c => c)) rows.push(row);
   }
   return rows;
 }
@@ -289,8 +289,8 @@ function parseCSV(text) {
 function PatientsPage() {
   const [query, setQuery] = useState("");
   const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [devices, setDevices] = useState([]);
+  const [headers, setHeaders] = useState([]);
   const [dbLoaded, setDbLoaded] = useState(false);
   const [showPatientEmail, setShowPatientEmail] = useState(false);
 
@@ -300,10 +300,11 @@ function PatientsPage() {
       .then(text => {
         const rows = parseCSV(text);
         if (rows.length < 2) return;
-        const headers = rows[0].map(h => h.trim().toLowerCase());
+        const hdrs = rows[0].map(h => h.trim());
+        setHeaders(hdrs);
         const parsed = rows.slice(1).map(row => {
           const obj = {};
-          headers.forEach((h, i) => obj[h] = row[i] || "");
+          hdrs.forEach((h, i) => { obj[h] = (row[i] || "").trim(); });
           return obj;
         });
         setDevices(parsed);
@@ -312,20 +313,23 @@ function PatientsPage() {
       .catch(() => setDbLoaded(false));
   }, []);
 
+  // Find the right column key case-insensitively
+  function col(device, keyword) {
+    const key = Object.keys(device).find(k => k.toLowerCase().includes(keyword.toLowerCase()));
+    return key ? device[key] : "";
+  }
+
   function handleSearch() {
     if (!query.trim() || !devices.length) return;
-    setLoading(true); setResult(null);
+    setResult(null);
     const q = query.trim().toLowerCase();
     const match = devices.find(d =>
-      (d["submission number (k number)"] || "").toLowerCase().includes(q) ||
-      (d["device name"] || "").toLowerCase().includes(q) ||
-      (d["company name"] || "").toLowerCase().includes(q)
+      col(d, "k number").toLowerCase().includes(q) ||
+      col(d, "submission number").toLowerCase().includes(q) ||
+      col(d, "device name").toLowerCase().includes(q) ||
+      col(d, "company name").toLowerCase().includes(q)
     );
-    setLoading(false);
-    if (!match) {
-      setResult({ notFound: true });
-      return;
-    }
+    if (!match) { setResult({ notFound: true }); return; }
     setResult(match);
   }
 
@@ -378,38 +382,32 @@ function PatientsPage() {
             </p>
           </div>
         )}
-        {result && !loading && !result.notFound && (
+        {result && !result.notFound && (
           <div style={{ marginTop: "1.25rem", background: TEAL_LIGHT, borderRadius: 8, padding: "1rem 1.25rem", border: "0.5px solid #9FE1CB" }}>
             <div style={{ fontSize: 11, fontWeight: 500, color: TEAL, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
               <SvgIcon name="notes" size={13} /> FDA Device Summary
             </div>
-            <div style={{ display: "grid", gap: 10 }}>
+            <div style={{ display: "grid", gap: 12 }}>
               {[
-                ["Device", result["device name"]],
-                ["Company", result["company name"]],
-                ["510(k) Number", result["submission number (k number)"]],
-                ["Date Cleared", result["date of submission"]],
-              ].filter(([,v]) => v).map(([label, val]) => (
+                ["Device", col(result, "device name")],
+                ["Company", col(result, "company name")],
+                ["510(k) Number", col(result, "submission number") || col(result, "k number")],
+                ["Date Cleared", col(result, "date of submission") || col(result, "date")],
+              ].filter(([, v]) => v).map(([label, val]) => (
                 <div key={label}>
                   <div style={{ fontSize: 11, fontWeight: 600, color: TEAL, textTransform: "uppercase", letterSpacing: "0.4px", marginBottom: 2 }}>{label}</div>
                   <div style={{ fontSize: 13, color: TEAL_DARK, lineHeight: 1.6 }}>{val}</div>
                 </div>
               ))}
-              {result["model description & demographics (race, age, gender, geography)"] && (
-                <div>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: TEAL, textTransform: "uppercase", letterSpacing: "0.4px", marginBottom: 2 }}>Who was it trained on?</div>
-                  <div style={{ fontSize: 13, color: TEAL_DARK, lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{result["model description & demographics (race, age, gender, geography)"]}</div>
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: TEAL, textTransform: "uppercase", letterSpacing: "0.4px", marginBottom: 2 }}>Who was it trained on?</div>
+                <div style={{ fontSize: 13, color: TEAL_DARK, lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
+                  {col(result, "demographics") || col(result, "model description") || "No demographic information was disclosed by the manufacturer. This is the transparency gap MedDisclosure.org is working to fix."}
                 </div>
-              )}
-              {result["summary text"] && (
-                <div>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: TEAL, textTransform: "uppercase", letterSpacing: "0.4px", marginBottom: 2 }}>Summary</div>
-                  <div style={{ fontSize: 13, color: TEAL_DARK, lineHeight: 1.6 }}>{result["summary text"]}</div>
-                </div>
-              )}
+              </div>
             </div>
             <div style={{ marginTop: 12, padding: "10px 12px", background: "rgba(255,255,255,0.6)", borderRadius: 6, fontSize: 11, color: "#666", lineHeight: 1.6 }}>
-              ⚠️ These summaries were auto-extracted from the original FDA 510(k) documents using pattern-matching, not manual review. Demographic figures in particular were parsed from flattened PDF tables and may be incomplete or misattributed. Always confirm any figure against the original summary text (included in this file) or the source PDF before citing or acting on it.
+              ⚠️ These summaries were auto-extracted from the original FDA 510(k) documents using pattern-matching, not manual review. Demographic figures in particular were parsed from flattened PDF tables and may be incomplete or misattributed. Always confirm any figure against the original summary text or the source PDF before citing or acting on it.
             </div>
           </div>
         )}
