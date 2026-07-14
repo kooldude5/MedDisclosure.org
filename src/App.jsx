@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Papa from "papaparse";
 
 const TEAL = "#0F6E56";
 const TEAL_LIGHT = "#E1F5EE";
@@ -267,21 +268,16 @@ function PatientsPage() {
   const [showPatientEmail, setShowPatientEmail] = useState(false);
 
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js";
-    script.onload = () => {
-      window.Papa.parse("https://e3mudghoy8iausqu.public.blob.vercel-storage.com/devices.csv", {
-        download: true,
-        header: true,
-        skipEmptyLines: true,
-        complete: ({ data }) => {
-          setDevices(data);
-          setDbLoaded(true);
-        },
-        error: () => setDbLoaded(false),
-      });
-    };
-    document.head.appendChild(script);
+    Papa.parse("https://e3mudghoy8iausqu.public.blob.vercel-storage.com/devices.csv", {
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      complete: ({ data }) => {
+        setDevices(data);
+        setDbLoaded(true);
+      },
+      error: () => setDbLoaded(false),
+    });
   }, []);
 
   function col(device, keyword) {
