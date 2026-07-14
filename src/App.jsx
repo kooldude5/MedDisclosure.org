@@ -257,40 +257,12 @@ function HomePage({ setPage, downloads }) {
   );
 }
 
-function parseCSV(text) {
-  const rows = [];
-  let i = 0;
-  while (i < text.length) {
-    const row = [];
-    while (i < text.length && text[i] !== '\n') {
-      if (text[i] === '"') {
-        let cell = '';
-        i++;
-        while (i < text.length) {
-          if (text[i] === '"' && text[i+1] === '"') { cell += '"'; i += 2; }
-          else if (text[i] === '"') { i++; break; }
-          else { cell += text[i++]; }
-        }
-        row.push(cell.trim());
-        if (text[i] === ',') i++;
-      } else {
-        let cell = '';
-        while (i < text.length && text[i] !== ',' && text[i] !== '\n') cell += text[i++];
-        row.push(cell.trim());
-        if (text[i] === ',') i++;
-      }
-    }
-    if (text[i] === '\n') i++;
-    if (row.some(c => c)) rows.push(row);
-  }
-  return rows;
-}
+
 
 function PatientsPage() {
   const [query, setQuery] = useState("");
   const [result, setResult] = useState(null);
   const [devices, setDevices] = useState([]);
-  const [headers, setHeaders] = useState([]);
   const [dbLoaded, setDbLoaded] = useState(false);
   const [showPatientEmail, setShowPatientEmail] = useState(false);
 
