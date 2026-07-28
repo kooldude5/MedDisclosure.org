@@ -162,7 +162,56 @@ function Footer({ setPage }) {
   );
 }
 
-function EmailDraft({ audience }) {
+function ModelCardExample() {
+  return (
+    <div style={{ border: "3px solid #000", background: "#fff", fontFamily: "Arial, sans-serif", fontSize: 11, marginTop: "1.5rem" }}>
+      <div style={{ padding: "8px 12px 6px", borderBottom: "8px solid #000" }}>
+        <div style={{ fontSize: 32, fontWeight: 900, lineHeight: 1, color: "#000", letterSpacing: "-1px" }}>Model Card</div>
+        <div style={{ fontSize: 11, color: "#000", marginTop: 2 }}>Mandatory disclosure — AI/ML medical device (21 CFR 807.92)</div>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: "4px solid #000" }}>
+        <div style={{ padding: "6px 12px", borderRight: "1px solid #000" }}>
+          <div style={{ fontSize: 10, color: "#555", textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 5 }}>Device name</div>
+          <div style={{ fontSize: 14, fontWeight: 700 }}>ChestView AI Diagnostic System</div>
+        </div>
+        <div style={{ padding: "6px 12px" }}>
+          <div style={{ fontSize: 10, color: "#555", textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 5 }}>Intended use population</div>
+          <div style={{ fontSize: 14, fontWeight: 700 }}>Adult patients, chest radiology, ages 18+</div>
+        </div>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", borderBottom: "4px solid #000" }}>
+        {[
+          { label: "Training dataset", rows: [["Total images","142,000"],["Time period","2015–2022"],["Source","3 US centers"]] },
+          { label: "Demographics", rows: [["Sex (F/M)","48% / 52%"],["Age range","18–91 (med. 58)"],["Geographic origin","United States"]] },
+          { label: "Race / ethnicity (OMB 2024)", rows: [["White","61%"],["Black or African American","14%"],["Hispanic or Latino","12%"],["Asian","8%"],["Middle Eastern or N. African","3%"],["Other / not reported","2%"]] },
+        ].map((col, i) => (
+          <div key={i} style={{ padding: "6px 12px", borderRight: i < 2 ? "1px solid #555" : "none" }}>
+            <div style={{ fontSize: 10, color: "#555", textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 5 }}>{col.label}</div>
+            {col.rows.map(([label, val]) => (
+              <div key={label} style={{ display: "flex", justifyContent: "space-between", fontSize: 11, padding: "3px 0", borderBottom: "0.5px solid #ccc" }}>
+                <span style={{ color: "#444" }}>{label}</span>
+                <span style={{ fontWeight: 700 }}>{val}</span>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: "1px solid #000" }}>
+        <div style={{ padding: "6px 12px", borderRight: "1px solid #000" }}>
+          <div style={{ fontSize: 10, color: "#555", textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 4 }}>Known performance gaps</div>
+          <div style={{ fontSize: 11, lineHeight: 1.5 }}>Sensitivity 4.2 percentage points lower in Black patients vs. White patients. No data available for patients under 18.</div>
+        </div>
+        <div style={{ padding: "6px 12px" }}>
+          <div style={{ fontSize: 10, color: "#555", textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 4 }}>Generalizability limits</div>
+          <div style={{ fontSize: 11, lineHeight: 1.5 }}>Validated on US academic center data only. Performance outside this setting has not been assessed.</div>
+        </div>
+      </div>
+      <div style={{ padding: "4px 12px", fontSize: 10, color: "#777" }}>
+        Illustrative example of proposed mandatory Model Card disclosure under amended 21 CFR 807.92 · MedDisclosure.org
+      </div>
+    </div>
+  );
+}
   const [copied, setCopied] = useState(false);
   const subject = "Support Mandatory AI Transparency in FDA-Cleared Medical Devices";
   const body = audience === "patient"
@@ -382,6 +431,16 @@ function PatientsPage() {
         )}
       </div>
 
+      <div style={{ background: "#fff", border: "0.5px solid #c8e6dc", borderRadius: 12, padding: "1.5rem", marginBottom: "2rem" }}>
+        <div style={{ fontSize: 13, fontWeight: 500, color: TEAL_DARK, marginBottom: 4 }}>
+          What a Model Card should look like
+        </div>
+        <p style={{ fontSize: 13, color: "#777", margin: "0 0 4px" }}>
+          This is an example of what manufacturers should be required to disclose. Right now, most don't.
+        </p>
+        <ModelCardExample />
+      </div>
+
       <h3 style={{ fontSize: 15, fontWeight: 500, color: TEAL_DARK, marginBottom: "1rem" }}>What you can do next</h3>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <div style={{ background: "#fff", border: "0.5px solid #c8e6dc", borderRadius: 10, padding: "1rem 1.25rem", display: "flex", gap: 14, alignItems: "flex-start" }}>
@@ -494,6 +553,12 @@ function ProvidersPage({ onDownload }) {
         <a href="/memo.pdf" target="_blank" rel="noreferrer" onClick={() => fetch("/api/downloads", { method: "POST" }).catch(() => {})} style={{ background: "none", border: `0.5px solid ${TEAL_MID}`, borderRadius: 7, padding: "7px 14px", fontSize: 13, color: TEAL_DARK, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6, textDecoration: "none" }}>
           <SvgIcon name="download" size={14} /> Download full memo
         </a>
+      </div>
+
+      <div style={{ background: "#fff", border: "0.5px solid #c8e6dc", borderRadius: 12, padding: "1.5rem", marginBottom: "1.5rem" }}>
+        <div style={{ fontSize: 13, fontWeight: 500, color: TEAL_DARK, marginBottom: 4 }}>What mandatory disclosure would look like</div>
+        <p style={{ fontSize: 13, color: "#777", margin: "0 0 4px" }}>This is the Model Card format we're asking FDA to require in every AI/ML 510(k) summary.</p>
+        <ModelCardExample />
       </div>
 
       <div style={{ marginBottom: "1.5rem" }}>
