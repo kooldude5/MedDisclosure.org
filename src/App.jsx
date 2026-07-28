@@ -163,34 +163,37 @@ function Footer({ setPage }) {
 }
 
 function ModelCardExample() {
+  const cols = [
+    { label: "Training dataset", rows: [["Total images","142,000"],["Time period","2015–2022"],["Source","3 US centers"]] },
+    { label: "Demographics", rows: [["Sex (F/M)","48% / 52%"],["Age range","18–91 (med. 58)"],["Geographic origin","United States"]] },
+    { label: "Race / ethnicity (OMB 2024)", rows: [["White","61%"],["Black or African American","14%"],["Hispanic or Latino","12%"],["Asian","8%"],["Middle Eastern or N. African","3%"],["Other / not reported","2%"]] },
+  ];
+  const lbl = { fontSize: 10, color: "#555", textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 5 };
+  const row = { display: "flex", justifyContent: "space-between", fontSize: 11, padding: "3px 0", borderBottom: "0.5px solid #ccc" };
   return (
-    <div style={{ border: "3px solid #000", background: "#fff", fontFamily: "Arial, sans-serif", fontSize: 11, marginTop: "1.5rem" }}>
+    <div style={{ border: "3px solid #000", background: "#fff", fontFamily: "Arial, sans-serif", marginTop: "1rem" }}>
       <div style={{ padding: "8px 12px 6px", borderBottom: "8px solid #000" }}>
-        <div style={{ fontSize: 32, fontWeight: 900, lineHeight: 1, color: "#000", letterSpacing: "-1px" }}>Model Card</div>
+        <div style={{ fontSize: 28, fontWeight: 900, lineHeight: 1, color: "#000", letterSpacing: "-1px" }}>Model Card</div>
         <div style={{ fontSize: 11, color: "#000", marginTop: 2 }}>Mandatory disclosure — AI/ML medical device (21 CFR 807.92)</div>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: "4px solid #000" }}>
         <div style={{ padding: "6px 12px", borderRight: "1px solid #000" }}>
-          <div style={{ fontSize: 10, color: "#555", textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 5 }}>Device name</div>
-          <div style={{ fontSize: 14, fontWeight: 700 }}>ChestView AI Diagnostic System</div>
+          <div style={lbl}>Device name</div>
+          <div style={{ fontSize: 13, fontWeight: 700 }}>ChestView AI Diagnostic System</div>
         </div>
         <div style={{ padding: "6px 12px" }}>
-          <div style={{ fontSize: 10, color: "#555", textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 5 }}>Intended use population</div>
-          <div style={{ fontSize: 14, fontWeight: 700 }}>Adult patients, chest radiology, ages 18+</div>
+          <div style={lbl}>Intended use population</div>
+          <div style={{ fontSize: 13, fontWeight: 700 }}>Adult patients, chest radiology, ages 18+</div>
         </div>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", borderBottom: "4px solid #000" }}>
-        {[
-          { label: "Training dataset", rows: [["Total images","142,000"],["Time period","2015–2022"],["Source","3 US centers"]] },
-          { label: "Demographics", rows: [["Sex (F/M)","48% / 52%"],["Age range","18–91 (med. 58)"],["Geographic origin","United States"]] },
-          { label: "Race / ethnicity (OMB 2024)", rows: [["White","61%"],["Black or African American","14%"],["Hispanic or Latino","12%"],["Asian","8%"],["Middle Eastern or N. African","3%"],["Other / not reported","2%"]] },
-        ].map((col, i) => (
+        {cols.map((col, i) => (
           <div key={i} style={{ padding: "6px 12px", borderRight: i < 2 ? "1px solid #555" : "none" }}>
-            <div style={{ fontSize: 10, color: "#555", textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 5 }}>{col.label}</div>
-            {col.rows.map(([label, val]) => (
-              <div key={label} style={{ display: "flex", justifyContent: "space-between", fontSize: 11, padding: "3px 0", borderBottom: "0.5px solid #ccc" }}>
-                <span style={{ color: "#444" }}>{label}</span>
-                <span style={{ fontWeight: 700 }}>{val}</span>
+            <div style={lbl}>{col.label}</div>
+            {col.rows.map(([l, v]) => (
+              <div key={l} style={row}>
+                <span style={{ color: "#444" }}>{l}</span>
+                <span style={{ fontWeight: 700 }}>{v}</span>
               </div>
             ))}
           </div>
@@ -198,11 +201,11 @@ function ModelCardExample() {
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: "1px solid #000" }}>
         <div style={{ padding: "6px 12px", borderRight: "1px solid #000" }}>
-          <div style={{ fontSize: 10, color: "#555", textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 4 }}>Known performance gaps</div>
+          <div style={lbl}>Known performance gaps</div>
           <div style={{ fontSize: 11, lineHeight: 1.5 }}>Sensitivity 4.2 percentage points lower in Black patients vs. White patients. No data available for patients under 18.</div>
         </div>
         <div style={{ padding: "6px 12px" }}>
-          <div style={{ fontSize: 10, color: "#555", textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 4 }}>Generalizability limits</div>
+          <div style={lbl}>Generalizability limits</div>
           <div style={{ fontSize: 11, lineHeight: 1.5 }}>Validated on US academic center data only. Performance outside this setting has not been assessed.</div>
         </div>
       </div>
