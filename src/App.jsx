@@ -19,22 +19,19 @@ const CASE_STUDIES = [
     title: "The care management algorithm",
     cite: "Obermeyer et al., Science, 2019",
     url: "https://www.science.org/doi/10.1126/science.aax2342",
-    short: "A commercial algorithm used by hundreds of health systems systematically underestimated the needs of Black patients by using healthcare costs as a proxy for health — replicating structural inequity at scale.",
-    body: "A widely-used commercial algorithm used healthcare costs as a proxy for health needs — systematically underestimating Black patients' severity. At any given risk score, Black patients flagged by the algorithm were considerably sicker than their White counterparts, yet ranked lower priority. Correcting the disparity would have more than doubled their access to care management. The problem was invisible because disclosure wasn't required."
+    body: "A widely-used commercial algorithm used healthcare costs as a proxy for health needs — systematically underestimating Black patients' severity. Correcting the disparity would have more than doubled their access to care management. The problem was invisible because disclosure wasn't required."
   },
   {
     title: "The skin cancer AI",
     cite: "Daneshjou et al., JAMA Dermatology, 2021",
     url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9379852/pdf/nihms-1825908.pdf",
-    short: "Of 70 dermatology AI studies, only 7 reported any skin tone data. Four had zero images of the darkest skin types — meaning FDA-cleared tools may be operating well outside their validated conditions for patients with darker skin.",
-    body: "Of 70 dermatology AI studies reviewed, only 7 reported any skin tone data. Four had no images of the darkest skin types (Fitzpatrick V and VI) at all. An FDA-cleared tool may be operating well outside its validated conditions for patients with darker skin — with no way for clinicians to know."
+    body: "Of 70 dermatology AI studies reviewed, only 7 reported any skin tone data. Four had no images of the darkest skin types at all. An FDA-cleared tool may be operating well outside its validated conditions for patients with darker skin — with no way for clinicians to know."
   },
   {
     title: "The pulse oximeter",
     cite: "Sjoding et al., NEJM, 2020; Johns Hopkins, 2024",
     url: "https://publichealth.jhu.edu/2024/pulse-oximeters-racial-bias",
-    short: "During COVID-19, pulse oximeters were three times more likely to give inaccurate readings for Black patients, masking hypoxemia and delaying care. The FDA testing standard required only two darkly pigmented validation subjects.",
-    body: "In every hospital room. During COVID-19, a device gating access to emergency care was approximately three times more likely to give inaccurate readings for Black patients. The FDA premarket testing standard, unchanged from 2013, required manufacturers to include just two darkly pigmented subjects. The result: delayed care for Black and Hispanic patients, and in some cases denial of medications they qualified for."
+    body: "During COVID-19, a device gating access to emergency care was approximately three times more likely to give inaccurate readings for Black patients. The FDA premarket testing standard required only two darkly pigmented subjects. The result: delayed care for Black and Hispanic patients."
   },
 ];
 
@@ -115,6 +112,92 @@ function InfoTooltip({ text }) {
   );
 }
 
+function ModelCardExample() {
+  const lbl = { fontSize: 10, color: "#555", textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 5 };
+  const rowStyle = { display: "flex", justifyContent: "space-between", fontSize: 11, padding: "3px 0", borderBottom: "0.5px solid #ccc" };
+  const cols = [
+    { label: "Training dataset", rows: [["Total images","142,000"],["Time period","2015–2022"],["Source","3 US centers"]] },
+    { label: "Demographics", rows: [["Sex (F/M)","48% / 52%"],["Age range","18–91 (med. 58)"],["Geographic origin","United States"]] },
+    { label: "Race / ethnicity (OMB 2024)", rows: [["White","61%"],["Black or African American","14%"],["Hispanic or Latino","12%"],["Asian","8%"],["Middle Eastern or N. African","3%"],["Other / not reported","2%"]] },
+  ];
+  return (
+    <div style={{ border: "3px solid #000", background: "#fff", fontFamily: "Arial, sans-serif", marginTop: "1rem" }}>
+      <div style={{ padding: "8px 12px 6px", borderBottom: "8px solid #000" }}>
+        <div style={{ fontSize: 28, fontWeight: 900, lineHeight: 1, color: "#000", letterSpacing: "-1px" }}>Model Card</div>
+        <div style={{ fontSize: 11, color: "#000", marginTop: 2 }}>Mandatory disclosure — AI/ML medical device (21 CFR 807.92)</div>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: "4px solid #000" }}>
+        <div style={{ padding: "6px 12px", borderRight: "1px solid #000" }}>
+          <div style={lbl}>Device name</div>
+          <div style={{ fontSize: 13, fontWeight: 700 }}>ChestView AI Diagnostic System</div>
+        </div>
+        <div style={{ padding: "6px 12px" }}>
+          <div style={lbl}>Intended use population</div>
+          <div style={{ fontSize: 13, fontWeight: 700 }}>Adult patients, chest radiology, ages 18+</div>
+        </div>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", borderBottom: "4px solid #000" }}>
+        {cols.map((col, i) => (
+          <div key={i} style={{ padding: "6px 12px", borderRight: i < 2 ? "1px solid #555" : "none" }}>
+            <div style={lbl}>{col.label}</div>
+            {col.rows.map(([l, v]) => (
+              <div key={l} style={rowStyle}>
+                <span style={{ color: "#444" }}>{l}</span>
+                <span style={{ fontWeight: 700 }}>{v}</span>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: "1px solid #000" }}>
+        <div style={{ padding: "6px 12px", borderRight: "1px solid #000" }}>
+          <div style={lbl}>Known performance gaps</div>
+          <div style={{ fontSize: 11, lineHeight: 1.5 }}>Sensitivity 4.2 percentage points lower in Black patients vs. White patients. No data available for patients under 18.</div>
+        </div>
+        <div style={{ padding: "6px 12px" }}>
+          <div style={lbl}>Generalizability limits</div>
+          <div style={{ fontSize: 11, lineHeight: 1.5 }}>Validated on US academic center data only. Performance outside this setting has not been assessed.</div>
+        </div>
+      </div>
+      <div style={{ padding: "4px 12px", fontSize: 10, color: "#777" }}>
+        Illustrative example of proposed mandatory Model Card disclosure under amended 21 CFR 807.92 · MedDisclosure.org
+      </div>
+    </div>
+  );
+}
+
+function EmailDraft({ audience }) {
+  const [copied, setCopied] = useState(false);
+  const subject = "Support Mandatory AI Transparency in FDA-Cleared Medical Devices";
+  const body = audience === "patient"
+    ? `Dear [Representative's Name],\n\nI am a constituent writing to urge your support for mandatory transparency requirements for AI-enabled medical devices cleared by the FDA.\n\nI recently learned that over 1,451 AI/ML medical devices have been cleared by the FDA, yet fewer than 1 in 4 disclose who they were tested on. As a patient, I have no way to know whether the AI tools used in my care were ever tested on people like me.\n\nI urge you to direct the FDA to require manufacturers to publicly disclose the demographic makeup of their AI device testing data. This is a simple fix — the data already exists. Patients just can't see it.\n\nFor more information, please visit: meddisclosure.org\n\nThank you for your time.\n\nSincerely,\n[Your Name]\n[Your City, State]`
+    : audience === "provider"
+    ? `Dear [Representative's Name],\n\nI am a healthcare provider writing to urge your support for mandatory transparency requirements for AI-enabled medical devices cleared by the FDA.\n\nOver 1,451 AI/ML medical devices have been cleared by the FDA, yet fewer than 1 in 4 disclose any information about the demographic composition of their validation data. As a clinician, I have no reliable way to know whether the AI tools I use daily were ever tested on patients who look like mine.\n\nI urge you to direct the FDA to amend 21 CFR 807.92 to require a standardized "Model Card" disclosure in every public 510(k) summary for AI/ML devices. This is a narrow, low-burden fix — manufacturers already collect this data internally. It simply requires them to make it public.\n\nFor more information, please visit: meddisclosure.org\n\nThank you for your time and leadership on this issue.\n\nSincerely,\n[Your Name]\n[Your Institution]\n[Your State]`
+    : `Dear [Representative's Name],\n\nI am writing to urge your support for mandatory transparency requirements for AI-enabled medical devices cleared by the FDA.\n\nOver 1,451 AI/ML medical devices have been cleared by the FDA, yet fewer than 1 in 4 disclose who they were tested on. Documented cases — including a commercial algorithm that cut Black patients' access to care management by more than half, and pulse oximeters that gave dangerously inaccurate readings for Black patients during COVID-19 — show the real-world consequences of this gap.\n\nThe fix is straightforward: amend 21 CFR 807.92 to require a standardized "Model Card" in every public 510(k) summary for AI/ML devices. This requires no new data collection — manufacturers already hold this information internally. The EU AI Act will require this documentation for European regulators beginning in 2026. American patients deserve the same transparency.\n\nFor more information and the full policy brief, please visit: meddisclosure.org\n\nThank you for your attention to this important issue.\n\nSincerely,\n[Your Name]\n[Your State]`;
+
+  function copy() {
+    navigator.clipboard?.writeText(`Subject: ${subject}\n\n${body}`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  return (
+    <div style={{ marginTop: 10, background: "#fff", border: `0.5px solid ${TEAL_MID}`, borderRadius: 8, overflow: "hidden" }}>
+      <div style={{ background: TEAL_LIGHT, padding: "8px 12px", fontSize: 12, fontWeight: 500, color: TEAL_DARK, borderBottom: `0.5px solid ${TEAL_MID}` }}>Subject: {subject}</div>
+      <pre style={{ margin: 0, padding: "12px", fontSize: 12, color: "#444", lineHeight: 1.7, whiteSpace: "pre-wrap", fontFamily: "inherit" }}>{body}</pre>
+      <div style={{ padding: "8px 12px", borderTop: `0.5px solid #d0e8e1`, display: "flex", gap: 8 }}>
+        <button onClick={copy} style={{ background: copied ? "#d0f0e5" : TEAL, color: copied ? TEAL_DARK : "#fff", border: "none", borderRadius: 6, padding: "5px 12px", fontSize: 12, fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 5 }}>
+          <SvgIcon name={copied ? "check" : "notes"} size={12} color={copied ? TEAL_DARK : "#fff"} />
+          {copied ? "Copied!" : "Copy to clipboard"}
+        </button>
+        <a href="https://www.house.gov/representatives/find-your-representative" target="_blank" rel="noreferrer" style={{ background: "none", border: `0.5px solid ${TEAL_MID}`, borderRadius: 6, padding: "5px 12px", fontSize: 12, color: TEAL, fontWeight: 500, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 5 }}>
+          <SvgIcon name="pin" size={12} /> Find your rep →
+        </a>
+      </div>
+    </div>
+  );
+}
+
 function NavBar({ page, setPage }) {
   return (
     <nav style={{ borderBottom: "0.5px solid #d0e8e1", padding: "0 2rem", display: "flex", alignItems: "center", justifyContent: "space-between", height: 56, background: "#fff" }}>
@@ -162,90 +245,6 @@ function Footer({ setPage }) {
   );
 }
 
-function ModelCardExample() {
-  const cols = [
-    { label: "Training dataset", rows: [["Total images","142,000"],["Time period","2015–2022"],["Source","3 US centers"]] },
-    { label: "Demographics", rows: [["Sex (F/M)","48% / 52%"],["Age range","18–91 (med. 58)"],["Geographic origin","United States"]] },
-    { label: "Race / ethnicity (OMB 2024)", rows: [["White","61%"],["Black or African American","14%"],["Hispanic or Latino","12%"],["Asian","8%"],["Middle Eastern or N. African","3%"],["Other / not reported","2%"]] },
-  ];
-  const lbl = { fontSize: 10, color: "#555", textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 5 };
-  const row = { display: "flex", justifyContent: "space-between", fontSize: 11, padding: "3px 0", borderBottom: "0.5px solid #ccc" };
-  return (
-    <div style={{ border: "3px solid #000", background: "#fff", fontFamily: "Arial, sans-serif", marginTop: "1rem" }}>
-      <div style={{ padding: "8px 12px 6px", borderBottom: "8px solid #000" }}>
-        <div style={{ fontSize: 28, fontWeight: 900, lineHeight: 1, color: "#000", letterSpacing: "-1px" }}>Model Card</div>
-        <div style={{ fontSize: 11, color: "#000", marginTop: 2 }}>Mandatory disclosure — AI/ML medical device (21 CFR 807.92)</div>
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: "4px solid #000" }}>
-        <div style={{ padding: "6px 12px", borderRight: "1px solid #000" }}>
-          <div style={lbl}>Device name</div>
-          <div style={{ fontSize: 13, fontWeight: 700 }}>ChestView AI Diagnostic System</div>
-        </div>
-        <div style={{ padding: "6px 12px" }}>
-          <div style={lbl}>Intended use population</div>
-          <div style={{ fontSize: 13, fontWeight: 700 }}>Adult patients, chest radiology, ages 18+</div>
-        </div>
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", borderBottom: "4px solid #000" }}>
-        {cols.map((col, i) => (
-          <div key={i} style={{ padding: "6px 12px", borderRight: i < 2 ? "1px solid #555" : "none" }}>
-            <div style={lbl}>{col.label}</div>
-            {col.rows.map(([l, v]) => (
-              <div key={l} style={row}>
-                <span style={{ color: "#444" }}>{l}</span>
-                <span style={{ fontWeight: 700 }}>{v}</span>
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: "1px solid #000" }}>
-        <div style={{ padding: "6px 12px", borderRight: "1px solid #000" }}>
-          <div style={lbl}>Known performance gaps</div>
-          <div style={{ fontSize: 11, lineHeight: 1.5 }}>Sensitivity 4.2 percentage points lower in Black patients vs. White patients. No data available for patients under 18.</div>
-        </div>
-        <div style={{ padding: "6px 12px" }}>
-          <div style={lbl}>Generalizability limits</div>
-          <div style={{ fontSize: 11, lineHeight: 1.5 }}>Validated on US academic center data only. Performance outside this setting has not been assessed.</div>
-        </div>
-      </div>
-      <div style={{ padding: "4px 12px", fontSize: 10, color: "#777" }}>
-        Illustrative example of proposed mandatory Model Card disclosure under amended 21 CFR 807.92 · MedDisclosure.org
-      </div>
-    </div>
-  );
-}
-  const [copied, setCopied] = useState(false);
-  const subject = "Support Mandatory AI Transparency in FDA-Cleared Medical Devices";
-  const body = audience === "patient"
-    ? `Dear [Representative's Name],\n\nI am a constituent writing to urge your support for mandatory transparency requirements for AI-enabled medical devices cleared by the FDA.\n\nI recently learned that over 1,451 AI/ML medical devices have been cleared by the FDA, yet fewer than 1 in 4 disclose who they were tested on. As a patient, I have no way to know whether the AI tools used in my care were ever tested on people like me.\n\nI urge you to direct the FDA to require manufacturers to publicly disclose the demographic makeup of their AI device testing data. This is a simple fix — the data already exists. Patients just can't see it.\n\nFor more information, please visit: meddisclosure.org\n\nThank you for your time.\n\nSincerely,\n[Your Name]\n[Your City, State]`
-    : audience === "provider"
-    ? `Dear [Representative's Name],\n\nI am a healthcare provider writing to urge your support for mandatory transparency requirements for AI-enabled medical devices cleared by the FDA.\n\nOver 1,451 AI/ML medical devices have been cleared by the FDA, yet fewer than 1 in 4 disclose any information about the demographic composition of their validation data. As a clinician, I have no reliable way to know whether the AI tools I use daily were ever tested on patients who look like mine.\n\nI urge you to direct the FDA to amend 21 CFR 807.92 to require a standardized "Model Card" disclosure in every public 510(k) summary for AI/ML devices. This is a narrow, low-burden fix — manufacturers already collect this data internally. It simply requires them to make it public.\n\nFor more information, please visit: meddisclosure.org\n\nThank you for your time and leadership on this issue.\n\nSincerely,\n[Your Name]\n[Your Institution]\n[Your State]`
-    : `Dear [Representative's Name],\n\nI am writing to urge your support for mandatory transparency requirements for AI-enabled medical devices cleared by the FDA.\n\nOver 1,451 AI/ML medical devices have been cleared by the FDA, yet fewer than 1 in 4 disclose who they were tested on. Documented cases — including a commercial algorithm that cut Black patients' access to care management by more than half, and pulse oximeters that gave dangerously inaccurate readings for Black patients during COVID-19 — show the real-world consequences of this gap.\n\nThe fix is straightforward: amend 21 CFR 807.92 to require a standardized "Model Card" in every public 510(k) summary for AI/ML devices. This requires no new data collection — manufacturers already hold this information internally. The EU AI Act will require this documentation for European regulators beginning in 2026. American patients deserve the same transparency.\n\nFor more information and the full policy brief, please visit: meddisclosure.org\n\nThank you for your attention to this important issue.\n\nSincerely,\n[Your Name]\n[Your State]`;
-
-  function copy() {
-    navigator.clipboard?.writeText(`Subject: ${subject}\n\n${body}`);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
-
-  return (
-    <div style={{ marginTop: 10, background: "#fff", border: `0.5px solid ${TEAL_MID}`, borderRadius: 8, overflow: "hidden" }}>
-      <div style={{ background: TEAL_LIGHT, padding: "8px 12px", fontSize: 12, fontWeight: 500, color: TEAL_DARK, borderBottom: `0.5px solid ${TEAL_MID}` }}>Subject: {subject}</div>
-      <pre style={{ margin: 0, padding: "12px", fontSize: 12, color: "#444", lineHeight: 1.7, whiteSpace: "pre-wrap", fontFamily: "inherit" }}>{body}</pre>
-      <div style={{ padding: "8px 12px", borderTop: `0.5px solid #d0e8e1`, display: "flex", gap: 8 }}>
-        <button onClick={copy} style={{ background: copied ? "#d0f0e5" : TEAL, color: copied ? TEAL_DARK : "#fff", border: "none", borderRadius: 6, padding: "5px 12px", fontSize: 12, fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 5 }}>
-          <SvgIcon name={copied ? "check" : "notes"} size={12} color={copied ? TEAL_DARK : "#fff"} />
-          {copied ? "Copied!" : "Copy to clipboard"}
-        </button>
-        <a href="https://www.house.gov/representatives/find-your-representative" target="_blank" rel="noreferrer" style={{ background: "none", border: `0.5px solid ${TEAL_MID}`, borderRadius: 6, padding: "5px 12px", fontSize: 12, color: TEAL, fontWeight: 500, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 5 }}>
-          <SvgIcon name="pin" size={12} /> Find your rep →
-        </a>
-      </div>
-    </div>
-  );
-}
-
 function HomePage({ setPage, downloads }) {
   const [hovered, setHovered] = useState(null);
   return (
@@ -267,7 +266,6 @@ function HomePage({ setPage, downloads }) {
           ))}
         </div>
       </div>
-
       <div style={{ background: "#f8fdfb", borderBottom: "0.5px solid #d0e8e1", padding: "2rem" }}>
         <div style={{ display: "flex", gap: 16, maxWidth: 720, margin: "0 auto", flexWrap: "wrap" }}>
           {STATS.map(s => <StatCard key={s.num} {...s} />)}
@@ -277,7 +275,6 @@ function HomePage({ setPage, downloads }) {
           </div>
         </div>
       </div>
-
       <div style={{ padding: "2.5rem 2rem", maxWidth: 720, margin: "0 auto" }}>
         <div style={{ background: "#fff", border: "0.5px solid #c8e6dc", borderRadius: 12, padding: "1.5rem 2rem", display: "flex", gap: "1.5rem", alignItems: "flex-start" }}>
           <div style={{ width: 48, height: 56, background: TEAL_LIGHT, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, border: `0.5px solid ${TEAL_MID}` }}>
@@ -293,7 +290,6 @@ function HomePage({ setPage, downloads }) {
           </div>
         </div>
       </div>
-
       <div style={{ background: "#f8fdfb", borderTop: "0.5px solid #d0e8e1", padding: "2.5rem 2rem" }}>
         <div style={{ maxWidth: 720, margin: "0 auto", display: "flex", gap: "2rem", alignItems: "center" }}>
           <div style={{ width: 56, height: 56, borderRadius: "50%", background: TEAL, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -310,14 +306,12 @@ function HomePage({ setPage, downloads }) {
   );
 }
 
-
-
 function PatientsPage() {
   const [query, setQuery] = useState("");
   const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [devices, setDevices] = useState([]);
   const [dbLoaded, setDbLoaded] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [showPatientEmail, setShowPatientEmail] = useState(false);
 
   useEffect(() => {
@@ -333,24 +327,26 @@ function PatientsPage() {
     });
   }, []);
 
-  function col(device, keyword) {
-    const key = Object.keys(device).find(k => k.toLowerCase().includes(keyword.toLowerCase()));
-    return key ? (device[key] || "").trim() : "";
-  }
-
   function handleSearch() {
     if (!query.trim() || !devices.length) return;
     setLoading(true);
     setResult(null);
     const q = query.trim().toLowerCase();
-    if (q.length < 3) { setResult({ notFound: true }); setLoading(false); return; }
+    if (q.length < 3) {
+      setResult({ notFound: true });
+      setLoading(false);
+      return;
+    }
     const match = devices.find(d =>
       (d["Submission Number (K Number)"] || "").toLowerCase().replace(/\s/g, "").includes(q.replace(/\s/g, "")) ||
       (d["Device Name"] || "").toLowerCase().includes(q) ||
       (d["Company Name"] || "").toLowerCase().includes(q)
     );
     setLoading(false);
-    if (!match) { setResult({ notFound: true }); return; }
+    if (!match) {
+      setResult({ notFound: true });
+      return;
+    }
     setResult(match);
   }
 
@@ -375,7 +371,7 @@ function PatientsPage() {
         ))}
       </div>
 
-      <div style={{ background: "#fff", border: "0.5px solid #c8e6dc", borderRadius: 12, padding: "1.5rem", marginBottom: "2rem" }}>
+      <div style={{ background: "#fff", border: "0.5px solid #c8e6dc", borderRadius: 12, padding: "1.5rem", marginBottom: "1.5rem" }}>
         <div style={{ fontSize: 13, fontWeight: 500, color: TEAL_DARK, marginBottom: 4, display: "flex", alignItems: "center", gap: 6 }}>
           Look up your device's Model Card <InfoTooltip text="A Model Card is a public document that describes how an AI device was built and tested. Not all devices have one — that's the gap we're working to fix." />
         </div>
@@ -388,16 +384,14 @@ function PatientsPage() {
         <div style={{ display: "flex", gap: 8 }}>
           <input value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSearch()} placeholder="e.g. K213929 or device name" style={{ flex: 1, padding: "9px 12px", borderRadius: 7, border: "0.5px solid #c8e6dc", fontSize: 14, outline: "none" }} />
           <button onClick={handleSearch} disabled={!dbLoaded} style={{ background: TEAL, color: "#fff", border: "none", borderRadius: 7, padding: "9px 18px", fontSize: 14, fontWeight: 500, cursor: dbLoaded ? "pointer" : "default", opacity: dbLoaded ? 1 : 0.5, display: "inline-flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}>
-            <SvgIcon name="search" size={14} color="#fff" /> Look up
+            <SvgIcon name="search" size={14} color="#fff" /> {loading ? "Searching…" : "Look up"}
           </button>
         </div>
-        {!dbLoaded && (
-          <div style={{ marginTop: 8, fontSize: 12, color: "#aaa" }}>Device database not loaded — make sure devices.csv is in the public folder.</div>
-        )}
-        {result && !loading && result.notFound && (
+        {!dbLoaded && <div style={{ marginTop: 8, fontSize: 12, color: "#aaa" }}>Loading device database…</div>}
+        {result && result.notFound && (
           <div style={{ marginTop: "1.25rem", background: "#fff8f0", borderRadius: 8, padding: "1rem 1.25rem", border: "0.5px solid #f5c07a" }}>
             <p style={{ fontSize: 14, color: "#7a4a00", lineHeight: 1.7, margin: 0 }}>
-              No matching device found. Try entering the exact 510(k) number (e.g. K213929) from your paperwork, or{" "}
+              No matching device found. Try entering the exact 510(k) number (e.g. K213929), or{" "}
               <a href="https://www.fda.gov/medical-devices/software-medical-device-samd/artificial-intelligence-enabled-medical-devices" target="_blank" rel="noreferrer" style={{ color: TEAL, fontWeight: 500 }}>search the FDA's AI device list</a>
               {" "}to find the K number first.
             </p>
@@ -428,19 +422,15 @@ function PatientsPage() {
               </div>
             </div>
             <div style={{ marginTop: 12, padding: "10px 12px", background: "rgba(255,255,255,0.6)", borderRadius: 6, fontSize: 11, color: "#666", lineHeight: 1.6 }}>
-              ⚠️ These summaries were auto-extracted from the original FDA 510(k) documents using pattern-matching, not manual review. Demographic figures in particular were parsed from flattened PDF tables and may be incomplete or misattributed. Always confirm any figure against the original summary text or the source PDF before citing or acting on it.
+              ⚠️ These summaries were auto-extracted from the original FDA 510(k) documents using pattern-matching, not manual review. Demographic figures may be incomplete or misattributed. Always confirm against the source PDF before citing or acting on it.
             </div>
           </div>
         )}
       </div>
 
       <div style={{ background: "#fff", border: "0.5px solid #c8e6dc", borderRadius: 12, padding: "1.5rem", marginBottom: "2rem" }}>
-        <div style={{ fontSize: 13, fontWeight: 500, color: TEAL_DARK, marginBottom: 4 }}>
-          What a Model Card should look like
-        </div>
-        <p style={{ fontSize: 13, color: "#777", margin: "0 0 4px" }}>
-          This is an example of what manufacturers should be required to disclose. Right now, most don't.
-        </p>
+        <div style={{ fontSize: 13, fontWeight: 500, color: TEAL_DARK, marginBottom: 4 }}>What a Model Card should look like</div>
+        <p style={{ fontSize: 13, color: "#777", margin: "0 0 4px" }}>This is an example of what manufacturers should be required to disclose. Right now, most don't.</p>
         <ModelCardExample />
       </div>
 
@@ -473,7 +463,7 @@ function PatientsPage() {
   );
 }
 
-function ProvidersPage({ onDownload }) {
+function ProvidersPage() {
   const [providerCount, setProviderCount] = useState(847);
   const [providerClicked, setProviderClicked] = useState(false);
   const [openCase, setOpenCase] = useState(null);
@@ -603,7 +593,7 @@ function ProvidersPage({ onDownload }) {
   );
 }
 
-function PolicyPage({ downloads, onDownload }) {
+function PolicyPage({ downloads }) {
   const [open, setOpen] = useState(null);
   const [showEmail, setShowEmail] = useState(false);
 
@@ -611,8 +601,7 @@ function PolicyPage({ downloads, onDownload }) {
     <div>
       <div style={{ background: TEAL, padding: "3.5rem 2rem", textAlign: "center" }}>
         <div style={{ fontSize: 11, color: "#9FE1CB", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9FE1CB" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21l18 0"/><path d="M3 10l18 0"/><path d="M5 6l7 -3l7 3"/><path d="M4 10l0 11"/><path d="M20 10l0 11"/><path d="M8 14l0 3"/><path d="M12 14l0 3"/><path d="M16 14l0 3"/></svg>
-          For policy makers
+          <SvgIcon name="bank" size={14} color="#9FE1CB" /> For policy makers
         </div>
         <h2 style={{ fontSize: 30, fontWeight: 500, color: "#fff", margin: "0 auto 1rem", maxWidth: 600, lineHeight: 1.25, letterSpacing: "-0.5px" }}>The FDA already identified the problem.<br />It's time to require the fix.</h2>
         <p style={{ fontSize: 15, color: "#9FE1CB", maxWidth: 520, margin: "0 auto", lineHeight: 1.7 }}>A structured, low-burden rule requiring manufacturers to publicly disclose what they already know about their AI — and what patients and clinicians deserve to know.</p>
@@ -713,20 +702,16 @@ export default function App() {
       .catch(() => setDownloads(128));
   }, []);
 
-  function handleSetPage(p) {
-    setPage(p);
-  }
-
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", background: "#fff", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      <NavBar page={page} setPage={handleSetPage} />
+      <NavBar page={page} setPage={setPage} />
       <div style={{ flex: 1 }}>
-        {page === "Home" && <HomePage setPage={handleSetPage} downloads={downloads} />}
+        {page === "Home" && <HomePage setPage={setPage} downloads={downloads} />}
         {page === "Patients" && <PatientsPage />}
         {page === "Providers" && <ProvidersPage />}
         {page === "Policy Makers" && <PolicyPage downloads={downloads} />}
       </div>
-      <Footer setPage={handleSetPage} />
+      <Footer setPage={setPage} />
     </div>
   );
 }
