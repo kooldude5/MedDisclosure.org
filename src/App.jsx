@@ -113,55 +113,66 @@ function InfoTooltip({ text }) {
 }
 
 function ModelCardExample() {
-  const lbl = { fontSize: 10, color: "#555", textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 5 };
+  const [open, setOpen] = useState(false);
+  const lbl = { fontSize: 10, color: "#555", textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 4 };
   const rowStyle = { display: "flex", justifyContent: "space-between", fontSize: 11, padding: "3px 0", borderBottom: "0.5px solid #ccc" };
   const cols = [
-    { label: "Training dataset", rows: [["Total images","142,000"],["Time period","2015–2022"],["Source","3 US centers"]] },
-    { label: "Demographics", rows: [["Sex (F/M)","48% / 52%"],["Age range","18–91 (med. 58)"],["Geographic origin","United States"]] },
-    { label: "Race / ethnicity (OMB 2024)", rows: [["White","61%"],["Black or African American","14%"],["Hispanic or Latino","12%"],["Asian","8%"],["Middle Eastern or N. African","3%"],["Other / not reported","2%"]] },
+    { label: "Training dataset", rows: [["Total images","142,000"],["Time period","2015–2022"],["Source","3 US centers"]], highlight: false },
+    { label: "Demographics", rows: [["Sex (F/M)","48% / 52%"],["Age range","18–91 (med. 58)"],["Geographic origin","United States"]], highlight: false },
+    { label: "Race / ethnicity (OMB 2024)", rows: [["White","61%"],["Black or African American","14%"],["Hispanic or Latino","12%"],["Asian","8%"],["Middle Eastern or N. African","3%"],["Other / not reported","2%"]], highlight: true },
   ];
   return (
-    <div style={{ border: "3px solid #000", background: "#fff", fontFamily: "Arial, sans-serif", marginTop: "1rem" }}>
-      <div style={{ padding: "8px 12px 6px", borderBottom: "8px solid #000" }}>
-        <div style={{ fontSize: 28, fontWeight: 900, lineHeight: 1, color: "#000", letterSpacing: "-1px" }}>Model Card</div>
-        <div style={{ fontSize: 11, color: "#000", marginTop: 2 }}>Mandatory disclosure — AI/ML medical device (21 CFR 807.92)</div>
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: "4px solid #000" }}>
-        <div style={{ padding: "6px 12px", borderRight: "1px solid #000" }}>
-          <div style={lbl}>Device name</div>
-          <div style={{ fontSize: 13, fontWeight: 700 }}>ChestView AI Diagnostic System</div>
-        </div>
-        <div style={{ padding: "6px 12px" }}>
-          <div style={lbl}>Intended use population</div>
-          <div style={{ fontSize: 13, fontWeight: 700 }}>Adult patients, chest radiology, ages 18+</div>
-        </div>
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", borderBottom: "4px solid #000" }}>
-        {cols.map((col, i) => (
-          <div key={i} style={{ padding: "6px 12px", borderRight: i < 2 ? "1px solid #555" : "none" }}>
-            <div style={lbl}>{col.label}</div>
-            {col.rows.map(([l, v]) => (
-              <div key={l} style={rowStyle}>
-                <span style={{ color: "#444" }}>{l}</span>
-                <span style={{ fontWeight: 700 }}>{v}</span>
+    <div style={{ marginTop: "1rem", border: `0.5px solid ${TEAL_MID}`, borderRadius: 8, overflow: "hidden" }}>
+      <button onClick={() => setOpen(v => !v)} style={{ width: "100%", background: TEAL_LIGHT, border: "none", padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer", textAlign: "left" }}>
+        <span style={{ fontSize: 13, fontWeight: 500, color: TEAL_DARK }}>See an example Model Card</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={TEAL} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d={open ? "M18 15l-6-6l-6 6" : "M6 9l6 6l6-6"} />
+        </svg>
+      </button>
+      {open && (
+        <div style={{ border: "3px solid #000", background: "#fff", fontFamily: "Arial, sans-serif" }}>
+          <div style={{ padding: "8px 12px 6px", borderBottom: "8px solid #000" }}>
+            <div style={{ fontSize: 28, fontWeight: 900, lineHeight: 1, color: "#000", letterSpacing: "-1px" }}>Model Card</div>
+            <div style={{ fontSize: 11, color: "#555", marginTop: 2 }}>Mandatory disclosure — AI/ML medical device (21 CFR 807.92)</div>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: "4px solid #000" }}>
+            <div style={{ padding: "6px 12px", borderRight: "1px solid #000" }}>
+              <div style={lbl}>Device name</div>
+              <div style={{ fontSize: 13, fontWeight: 700 }}>ChestView AI Diagnostic System</div>
+            </div>
+            <div style={{ padding: "6px 12px" }}>
+              <div style={lbl}>Intended use population</div>
+              <div style={{ fontSize: 13, fontWeight: 700 }}>Adult patients, chest radiology, ages 18+</div>
+            </div>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", borderBottom: "4px solid #000" }}>
+            {cols.map((col, i) => (
+              <div key={i} style={{ padding: "6px 12px", borderRight: i < 2 ? "1px solid #555" : "none", outline: col.highlight ? "3px solid #cc0000" : "none", outlineOffset: "-3px" }}>
+                <div style={lbl}>{col.label}</div>
+                {col.rows.map(([l, v]) => (
+                  <div key={l} style={rowStyle}>
+                    <span style={{ color: "#444" }}>{l}</span>
+                    <span style={{ fontWeight: 700 }}>{v}</span>
+                  </div>
+                ))}
               </div>
             ))}
           </div>
-        ))}
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: "1px solid #000" }}>
-        <div style={{ padding: "6px 12px", borderRight: "1px solid #000" }}>
-          <div style={lbl}>Known performance gaps</div>
-          <div style={{ fontSize: 11, lineHeight: 1.5 }}>Sensitivity 4.2 percentage points lower in Black patients vs. White patients. No data available for patients under 18.</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: "1px solid #000" }}>
+            <div style={{ padding: "6px 12px", borderRight: "1px solid #000" }}>
+              <div style={lbl}>Known performance gaps</div>
+              <div style={{ fontSize: 11, lineHeight: 1.5 }}>Sensitivity 4.2 percentage points lower in Black patients vs. White patients. No data available for patients under 18.</div>
+            </div>
+            <div style={{ padding: "6px 12px" }}>
+              <div style={lbl}>Generalizability limits</div>
+              <div style={{ fontSize: 11, lineHeight: 1.5 }}>Validated on US academic center data only. Performance outside this setting has not been assessed.</div>
+            </div>
+          </div>
+          <div style={{ padding: "4px 12px", fontSize: 10, color: "#777" }}>
+            Illustrative example of proposed mandatory Model Card disclosure under amended 21 CFR 807.92 · MedDisclosure.org
+          </div>
         </div>
-        <div style={{ padding: "6px 12px" }}>
-          <div style={lbl}>Generalizability limits</div>
-          <div style={{ fontSize: 11, lineHeight: 1.5 }}>Validated on US academic center data only. Performance outside this setting has not been assessed.</div>
-        </div>
-      </div>
-      <div style={{ padding: "4px 12px", fontSize: 10, color: "#777" }}>
-        Illustrative example of proposed mandatory Model Card disclosure under amended 21 CFR 807.92 · MedDisclosure.org
-      </div>
+      )}
     </div>
   );
 }
